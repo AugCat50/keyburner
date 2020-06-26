@@ -1,0 +1,14 @@
+.statistics-section{
+    display: flex;
+    justify-content: center;
+    font-size: 14px;
+    padding: 10px;
+}
+
+.statistics-section__item:first-child{
+    margin-right: 15px;
+}
+
+.statistics-section__item + .statistics-section__item{
+    margin-left: 10px;
+}

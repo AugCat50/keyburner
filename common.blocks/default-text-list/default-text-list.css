@@ -1,0 +1,19 @@
+.default-text-list{
+/*    border: 1px solid red;*/
+    margin-top: 40px;
+}
+
+.default-text-list__head{
+/*    color: rgb(255,255,255);*/
+    font-size: 22px;
+}
+
+.default-text-list__name{
+    margin-bottom: 5px;
+    font-size: 18px;
+}
+
+.default-text-list__name:hover{
+    cursor: pointer;
+}
+

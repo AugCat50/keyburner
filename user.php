@@ -125,12 +125,11 @@
             <div class="dialog__display">
                 <form class="dialog__form" method="post">
                     <h3 class="dialog__h bright-blue-neon">Регистрация</h3>
-                    <input name="user" class="dialog__input blue-neon-box js_check-in-name" type="text" placeholder="Login">
-                    <input name="password" class="dialog__input blue-neon-box js_check-in-password1" type="text" placeholder="Password">
-                    <input name="password-2" class="dialog__input blue-neon-box js_check-in-password2" type="text" placeholder="Repeat password">
-                    <input name="mail" class="dialog__input blue-neon-box js_check-in-mail" type="email" placeholder="Email">
-                    <div class="dialog__message pink-neon js_check-in-message"></div>
-                    <button class="button dialog__button js_check-in-ready">Регистрация</button>
+                    <input name="user" class="dialog__input blue-neon-box" type="text" placeholder="Login">
+                    <input name="password" class="dialog__input blue-neon-box" type="text" placeholder="Password">
+                    <input name="password-2" class="dialog__input blue-neon-box" type="text" placeholder="Password">
+                    <input name="mail" class="dialog__input blue-neon-box" type="email" placeholder="Email">
+                    <button class="button dialog__button">Регистрация</button>
                     <button class="button dialog__button js_check-in__hide">Отмена</button>
                 </form>
             </div>

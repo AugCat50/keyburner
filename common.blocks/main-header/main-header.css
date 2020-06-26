@@ -1,0 +1,12 @@
+.main-header{
+    border-radius: 3px;
+    padding: 10px;
+}
+
+.main-header_h1{
+    font-size: 36px;
+}
+
+.main-header-menu__item{
+    cursor: pointer;
+}
