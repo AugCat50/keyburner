@@ -1,12 +1,15 @@
 <?php
+    define('CHECKIN','true');
     require_once("../model/model.php");
     
+    
+    //isset!!!
     if($_POST["name"] && $_POST["pass_1"] && $_POST["pass_2"] && $_POST["mail"]){
         //Смотрим есть ли в базе такой логин или почта
-//        $h_name = hash("sha512", $_POST["name"]);
-//        $h_mail = hash("sha512", $_POST["mail"]);
-        $h_name = $_POST["name"];
-        $h_mail = $_POST["mail"];
+        $h_name = hash("sha512", $_POST["name"]);
+        $h_mail = hash("sha512", $_POST["mail"]);
+//        $h_name = $_POST["name"];
+//        $h_mail = $_POST["mail"];
         
         $is_name_user = get_user($pdo, $h_name);
         $is_mail_user = get_user($pdo, false, $h_mail);

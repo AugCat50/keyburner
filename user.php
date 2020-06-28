@@ -134,5 +134,6 @@
                 </form>
             </div>
         </dialog>
+        <?php require_once "controllers/component_activation.php"?>
     </body>
 </html>

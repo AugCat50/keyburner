@@ -1,7 +1,18 @@
 <?php
-     //Адрес почты от кого отправляем
-     define('SENDER','Регистрация на http://keyburner.com <augcat50@mail.com>');
+    use PHPMailer\PHPMailer\PHPMailer;
+    use PHPMailer\PHPMailer\SMTP;
+    use PHPMailer\PHPMailer\Exception;
+    
+    if(defined('CHECKIN')){
+        require_once "../vendor/autoload.php";
+//        echo "true<br>";
+    }else{
+//        echo "false<br>";
+    }
 
+    //Адрес почты от кого отправляем
+    define('SENDER','augcat50@gmail.com');
+    
     try {
         $pdo = new PDO('mysql:host=localhost;dbname=keyburner', 'user_1', 'S8uGbAmSciyAid8u');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -83,7 +94,53 @@
         
         return $data;
     }
+    
+     /**Отпровка почты
+     * @param string  $to
+     * @param string  $title
+     * @param string  $message_html
+     * @param string  $message_nohtml
+     */
+    function send_mail($to, $title, $message_html, $message_nohtml){
 
+        $mail = new PHPMailer(true);
+        try{
+            $mail->CharSet = 'UTF-8';
+            //Server settings
+            //Подробный лог на страницу
+            //$mail->SMTPDebug  = SMTP::DEBUG_SERVER;
+            $mail->isSMTP();
+            $mail->Host       = "smtp.gmail.com";
+            $mail->SMTPAuth   = true;
+            $mail->Username   = "augcat50@gmail.com";
+            $mail->Password   = "pass";
+            //    $mail->SMTPSecure = "ssl";
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            //    $mail->Port       = "465";
+            $mail->Port       = 587;
+            
+            //Recipients
+            $mail->setFrom("augcat50@gmail.com", "Keyburner.com");
+            $mail->addAddress($to);
+            //$mail->addAddress("wilcher@mail.ru");
+            
+            // Content
+            $mail->isHTML(true);
+            $mail->Subject = $title;
+            //$mail->Subject = "Активация учётной записи";
+            $mail->Body    = $message_html;
+            $mail->AltBody = $message_nohtml;
+            
+            $mail->send();
+            $data = "На почту отправлено письмо, активируйте учётную запись!";
+        }catch (Exception $e){
+            $data = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
+        
+        return $data;
+    }
+    
+    //Функция для регистрации пользователей
     function check_in_user($pdo, $name, $password, $mail){
         
         //Солим пароль, хешируем. Логин и почта без соли
@@ -122,9 +179,10 @@
         $hashed_key = hash("sha512", $key);
         
         //Отправляем письмо
-        $title = "Активация аккаунта на keyburner.com";
-        $message = "Для активации пройдите по ссылке: <a href='http://94.244.191.245/keyburner/index.php?key=$hashed_key'>Активировать</a>";
-        $and_mail = send_activation_mail($mail, SENDER, $title, $message);
+        $title = "Активация учётной записи на keyburner.com";
+        $message_html = "Активируйте учётную запись, пройдя по ссылке: <a href='http://94.244.191.245/keyburner/user.php?key=$hashed_key'>Активировать</a>";
+        $message_nohtml = "Активируйте учётную запись пройдя по ссылке: http://94.244.191.245/keyburner/user.php?key=$hashed_key";
+        $and_mail = send_mail($mail, $title, $message_html, $message_nohtml);
         
         //Делаем запись в таблицу ожидающих активации
         try{
@@ -134,7 +192,7 @@
             $stmt->bindParam(':key_act', $hashed_key);
             $stmt->bindParam(':mail', $mail);
             $stmt->execute();
-            $data=$data."Активируйте учётную запись<br>";
+//            $data=$data."Активируйте учётную запись<br>";
         }catch(PDOException $e){
             $data = "Ошибка в model -- check_in_user при получении id пользователя из users:" . $e->getMessage() . "<br>";
         }
@@ -143,27 +201,29 @@
         return $data;
     }
 
-     /**Отпровляем сообщение на почту
-     * @param string  $to
-     * @param string  $from
-     * @param string  $title
-     * @param string  $message
-     */
-    function send_activation_mail($to, $from, $title, $message){
-        //Формируем заголовок письма
-        $subject = $title;
-        $subject = '=?utf-8?b?'. base64_encode($subject) .'?=';
-
-        //Формируем заголовки для почтового сервера
-        $headers  = "Content-type: text/html; charset=\"utf-8\"\r\n";
-        $headers .= "From: ". $from ."\r\n";
-        $headers .= "MIME-Version: 1.0\r\n";
-        $headers .= "Date: ". date('D, d M Y h:i:s O') ."\r\n";
-
-        //Отправляем данные на ящик админа сайта
-        if(!mail($to, $subject, $message, $headers)){
-            return 'Ошибка отправки письма!';  
+    function activation($pdo, $key){
+        try{
+            $query = "SELECT 1 FROM temp WHERE key_act = :key";
+            $stmt  = $pdo->prepare($query);
+            $stmt->bindParam(':key', $key);
+            $stmt->execute();
+            $user = $stmt->fetch();
+        }catch(PDOException $e){
+            $data = "Ошибка в model -- activation:" . $e->getMessage() . "<br>";
+        }
+        
+        if($user){
+            try{
+                $query = "DELETE FROM temp WHERE key_act = :key";
+                $stmt = $pdo->prepare($query);
+                $stmt->bindParam(":key", $key);
+                $stmt->execute();
+                $data = "Аккаунт активирован!";
+            }catch(PDOException $e){
+                $data = "Ошибка в model -- activation при удалении из temp:" . $e->getMessage() . "<br>";
+            }
         }else{
-            return 'Письмо отправлено!';
-        } 
+            $data = "Ключ активации не подошёл!";
+        }
+        return $data;
     }
