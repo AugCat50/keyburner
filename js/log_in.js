@@ -12,7 +12,7 @@ function log_in(){
         
         
         $.ajax({
-            url: "controllers/log_in.php",
+            url: "ajax_log_in.php",
             method: "post",
             data:{
                 name: name,
@@ -20,10 +20,13 @@ function log_in(){
                 password: password
             },
             success: function(data){
+                if(data === "Есть совпадение!"){
+                    document.location.href = 'user.php';
+                }
                 $(".dialog__message").html(data);
             },
             error: function(data){
-                alert(data);
+                alert("ajax error:"+data);
             }
         });
     }

@@ -35,7 +35,7 @@
         <script src="js/main.js"></script>
         <script src="js/log_in.js"></script>
         <script src="js/check_in.js"></script>
-        <script src="js/default_text.js"></script>
+<!--        <script src="js/default_text.js"></script>-->
     </head>
     
     <body class="body">
@@ -45,6 +45,7 @@
                     <h1 class="h1 main-header_h1 bright-blue-neon">Keyburner</h1>
                     <menu class="main-header-menu">
                         <nav>
+                            <li class="blue-neon main-header-menu__item js_clean-all"><span class='pointer'>&#187;</span> Новый текст</li>
                             <li class="blue-neon main-header-menu__item js_check-in__show"><span class='pointer'>&#187;</span> Регистрация</li>
                             <li class="blue-neon main-header-menu__item js_authorization__show"><span class='pointer'>&#187;</span> Вход</li>
 <!--                            <li class="blue-neon main-header-menu__item"><span class='pointer'>&#187;</span> Добавить текст</li>-->
@@ -53,7 +54,7 @@
                     <ul class="default-text-list">
                         <h3 class="default-text-list__head pink-neon">Быстрый старт:</h3>
                         <?php
-                            require_once "controllers/show_default_text.php";
+                            require_once "controllers/component_default_get_name_texts.php";
                             foreach($data as $val){
                                 echo "<li class='default-text-list__name blue-neon' data-id=".$val['id']."><span class='pointer'>&#187;</span> " . $val['name'] . "</li>";
                             }
@@ -87,7 +88,7 @@
                         <div class="statistics-section__item blue-neon last"><span class="">(симв. в мин.)</span></div>
                     </section>
                     
-                    <section class="section main__section">
+                    <section class="section main__section js_section-template">
                         <textarea class="textarea main__textarea blue-neon-box js-main-textarea js-textarea" placeholder='Добавьте ваш текст в это окно или выберите текст из списка'></textarea>
                     </section>
                     
@@ -95,8 +96,8 @@
                         <textarea class="textarea main__textarea main__work-textarea blue-neon-box js-work-textarea js-textarea" placeholder='Сначала добавьте текст в верхнее поле' autofocus disabled></textarea>
                     </section>
                     
-                    <button class="button test-button" id="test">Test</button>
-                    <button class="button js-replaceWith">Edit text</button>
+<!--                    <button class="button pink-neon pink-neon-box test-button" id="test">Test</button>-->
+                    <button class="button main__button pink-neon pink-neon-box js-replaceWith" title="Редактировать"><img src="img/edit.png" class="main__ico"></button>
                 </main>
             </div>
             
@@ -116,8 +117,8 @@
                     <input name="user" class="dialog__input blue-neon-box js_log-in-name" type="text" placeholder="Login">
                     <input name="password" class="dialog__input blue-neon-box js_log-in-password" type="password" placeholder="Password">
                     <div class="dialog__message pink-neon"></div>
-                    <button class="button dialog__button js_log-in-ready">Войти</button>
-                    <button class="button dialog__button js_authorization__hide">Отмена</button>
+                    <button class="button dialog__button blue-neon-box js_log-in-ready">Войти</button>
+                    <button class="button dialog__button blue-neon-box js_authorization__hide">Отмена</button>
                 </form>
             </div>
         </dialog>
@@ -130,8 +131,8 @@
                     <input name="password-2" class="dialog__input blue-neon-box js_check-in-password2" type="text" placeholder="Repeat password">
                     <input name="mail" class="dialog__input blue-neon-box js_check-in-mail" type="email" placeholder="Email">
                     <div class="dialog__message pink-neon js_check-in-message"></div>
-                    <button class="button dialog__button js_check-in-ready">Регистрация</button>
-                    <button class="button dialog__button js_check-in__hide">Отмена</button>
+                    <button class="button dialog__button blue-neon-box js_check-in-ready">Регистрация</button>
+                    <button class="button dialog__button blue-neon-box js_check-in__hide">Отмена</button>
                 </form>
             </div>
         </dialog>

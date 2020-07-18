@@ -4,7 +4,7 @@
     use PHPMailer\PHPMailer\Exception;
     
     if(defined('CHECKIN')){
-        require_once "../vendor/autoload.php";
+        require_once "vendor/autoload.php";
 //        echo "true<br>";
     }else{
 //        echo "false<br>";
@@ -22,28 +22,29 @@
     }
     
     
-    function get_default_text($pdo, $hidden){
+    function default_get_neme_texts($pdo, $hidden){
         if(!$hidden){
-            $query = "SELECT * FROM default_text WHERE hidden = false";
+            $query = "SELECT id, name FROM default_text WHERE hidden = false";
         } else{
-            $query = "SELECT * FROM default_text";
+            $query = "SELECT id, name FROM default_text";
         }
         
         try{
             $boock = $pdo->query($query);
             
             for($i=0; $text = $boock->fetch(); $i++){
-                $data["text $i"]["id"]     = $text["id"];
-                $data["text $i"]["name"]   = $text["name"];
-                $data["text $i"]["text"]   = $text["text"];
-                $data["text $i"]["hidden"] = $text["hidden"];
+                $data["text $i"]["id"]   = $text["id"];
+                $data["text $i"]["name"] = $text["name"];
+//                $data["text $i"]["text"]   = $text["text"];
+//                $data["text $i"]["hidden"] = $text["hidden"];
             }
         }catch(PDOException $e){
-            $data = "Ошибка в get_default_text: " . $e->getMessage() . "<br>";
+            $data = "Ошибка в default_get_neme_texts: " . $e->getMessage() . "<br>";
         }
         
         return $data;
     }
+    
     
     function get_one_default_text($pdo, $id){
         $query = "SELECT text FROM default_text WHERE id = $id";
@@ -58,7 +59,43 @@
         
         return $data;
     }
-
+    
+    
+    function user_get_name_texts($pdo){
+        $id    = $_SESSION['id'];
+        $query = "SELECT id, area, name FROM texts WHERE id_user = $id";
+        
+        try{
+            $boock = $pdo->query($query);
+            for($i=0; $text = $boock->fetch(); $i++){
+                $data["text $i"]["id"]   = $text["id"];
+                $data["text $i"]["area"] = $text["area"];
+                $data["text $i"]["name"] = $text["name"];
+            }
+        }catch(PDOException $e){
+            $data = "Ошибка в user_get_name_texts: " . $e->getMessage() . "<br>";
+        }
+        
+        return $data;
+    }
+    
+    
+    //Не ясно, стоит ли проверять и id пользователя. Учитывая что он видит в списках только свои тексты
+    function get_one_user_text($pdo, $id){
+        $query = "SELECT text FROM texts WHERE id = $id";
+        
+        try{
+            $text = $pdo->query($query);
+            $content = $text->fetch();
+            $data = $content["text"];
+        }catch(PDOException $e){
+            $data = "Ошибка в get_one_user_text: " . $e->getMessage() . "<br>";
+        }
+        
+        return $data;
+    }
+    
+    
     function get_user($pdo, $name = false, $mail = false){
         if($name){
             //            $query = "SELECT * FROM users WHERE name = '$name'";
@@ -94,6 +131,7 @@
         
         return $data;
     }
+
     
      /**Отпровка почты
      * @param string  $to
@@ -113,7 +151,7 @@
             $mail->Host       = "smtp.gmail.com";
             $mail->SMTPAuth   = true;
             $mail->Username   = "augcat50@gmail.com";
-            $mail->Password   = "pass";
+            $mail->Password   = "Germiona8000";
             //    $mail->SMTPSecure = "ssl";
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             //    $mail->Port       = "465";
@@ -139,6 +177,7 @@
         
         return $data;
     }
+
     
     //Функция для регистрации пользователей
     function check_in_user($pdo, $name, $password, $mail){
@@ -201,6 +240,7 @@
         return $data;
     }
 
+
     function activation($pdo, $key){
         try{
             $query = "SELECT 1 FROM temp WHERE key_act = :key";
@@ -215,7 +255,7 @@
         if($user){
             try{
                 $query = "DELETE FROM temp WHERE key_act = :key";
-                $stmt = $pdo->prepare($query);
+                $stmt  = $pdo->prepare($query);
                 $stmt->bindParam(":key", $key);
                 $stmt->execute();
                 $data = "Аккаунт активирован!";
@@ -225,5 +265,83 @@
         }else{
             $data = "Ключ активации не подошёл!";
         }
+        return $data;
+    }
+
+
+    function add_user_text($pdo, $name, $theme, $text){
+        if(!$pdo){
+            return "add_user_text -- необходимо передать объект PDO в пером аргументе!";
+        }else if(!$name){
+            return "add_user_text -- второй аргумент - имя - не должен быть пуст!";
+        }else if(!$theme){
+            return "add_user_text -- третий аргумент - тема - не должен быть пуст!";
+        }else if(!$text){
+            return "add_user_text -- четвёртый аргумент - текст - не должен быть пуст!";
+        }
+        
+//        try{
+//            $query = "SELECT 1 FROM texts WHERE (id_user = :id_user) AND (name = :name) AND (area = :theme)";
+//            $stmt  = $pdo->prepare($query);
+//            $stmt->bindParam(":id_user", $_SESSION["id"]);
+//            $stmt->bindParam(":theme", $theme);
+//            $stmt->bindParam(":name", $name);
+//            $stmt->execute();
+//            $exist_text = $stmt->fetch();
+//            
+//            if($exist_text){
+//                $data = "У вас уже есть текст с этим именем в этой теме!";
+//                return $data;
+//            }
+//        }catch(PDOException $e){
+//            $data = "Ошибка в model -- add_user_text при попытке проверить наличие текста в texts:" . $e->getMessage() . "<br>";
+//        }
+        
+        try{
+            $query = "INSERT INTO texts (id_user, name, area, text) VALUES (:id_user, :name, :theme, :text)";
+            $stmt  = $pdo->prepare($query);
+            $stmt->bindParam(":id_user", $_SESSION["id"]);
+            $stmt->bindParam(":name", $name);
+            $stmt->bindParam(":theme", $theme);
+            $stmt->bindParam(":text", $text);
+            $stmt->execute();
+            $data = "Текст сохранён!";
+        }catch(PDOException $e){
+            $data = "Ошибка в model -- add_user_text при попытке добавить текст в texts:" . $e->getMessage() . "<br>";
+        }
+        
+        return $data;
+    }
+    
+    
+    function edit_user_text($pdo, $id, $name, $theme, $text){
+        try{
+            $query = "UPDATE texts SET area = :theme, name = :name, text = :text WHERE id = :id";
+            $stmt  = $pdo->prepare($query);
+            $stmt->bindParam(":id", $id);
+            $stmt->bindParam(":name", $name);
+            $stmt->bindParam(":theme", $theme);
+            $stmt->bindParam(":text", $text);
+            $stmt->execute();
+            $data = "Текст обновлён!";
+        }catch(PDOException $e){
+            $data = "Ошибка в model -- edit_user_text при попытке обновить текст в texts:" . $e->getMessage() . "<br>";
+        }
+        
+        return $data;
+    }
+    
+    
+    function del_user_text($pdo, $id){
+        try{
+            $query = "DELETE FROM texts WHERE id = :id";
+            $stmt  = $pdo->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            $data = "Текст удалён!";
+        }catch(PDOException $e){
+            $data = "Ошибка в model -- del_user_text при попытке удалить текст из texts:" . $e->getMessage() . "<br>";
+        }
+        
         return $data;
     }

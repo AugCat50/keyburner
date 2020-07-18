@@ -1,12 +1,49 @@
 .main-header{
     border-radius: 3px;
     padding: 10px;
+    max-width: 250px;
 }
 
 .main-header_h1{
     font-size: 36px;
 }
 
+.main-header_h2{
+    margin-bottom: 0;
+}
+
+.main-header-menu{
+    margin-bottom:  40px;
+}
+
 .main-header-menu__item{
     cursor: pointer;
+}
+
+.main-header-menu .link{
+    text-decoration: none;
+}
+
+.search{
+    margin-bottom: 20px;
+    margin-top: 10px;
+    padding: 4px;
+    position: relative;
+    padding-right: 10px;
+    background-color: rgba(0,0,0,.5);
+}
+
+.search__input{
+    background: none;
+    border: none;
+    color: #c6e2ff;
+}
+
+.search__go{
+    border: none;
+    background: none;
+    cursor: pointer;
+    position: absolute;
+    top: 6px;
+    right: 4px;
 }

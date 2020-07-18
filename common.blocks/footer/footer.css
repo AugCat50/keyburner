@@ -1,4 +1,9 @@
 .footer{
     margin: 20px auto;
     text-align: center;
+/*    color: black;*/
+}
+
+.footer a{
+    color: black;
 }

@@ -1,6 +1,5 @@
 "use strict"
 function main_ready(){
-//    var MAIN_TEXT   = ""; 
     var BLOCK_STATUS = false;
     var WORK_AREA   = $('.js-work-textarea');
     var CLONE_TEXT  = "";
@@ -12,15 +11,18 @@ function main_ready(){
         let qwe = val.replace(/\n+\s+/g, "\n");
         qwe = qwe.replace(/[ \f\r\t\v\u00A0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u2028\u2029\u202f\u205f\u3000][ \f\r\t\v\u00A0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u2028\u2029\u202f\u205f\u3000]+/g, " ");
         qwe = qwe.replace(/[ \n\f\r\t\v\u00A0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u2028\u2029\u202f\u205f\u3000][ \n]+/g, "\n");
-        qwe = qwe.replace(/[\n]+/g, "\u21B5\n");
+        qwe = qwe.replace(/[\n\u21B5]+/g, "\u21B5\n");
         
         if(qwe!==val){
             $(".js-main-textarea").val(qwe);
         }else{
             $(".js-main-textarea").val(val);
         }
+        
+        return qwe;
     }
     
+    //Обнуление переменных
     function null_var(){
         BLOCK_STATUS    = false;
         startStr        = 0;
@@ -36,8 +38,14 @@ function main_ready(){
         errors          = 0;
     }
     
+    //Количество текстов в категории
+    $(".user-text-list").each(function () {
+        let q = $(this).find('.select__option').length;
+        $(this).children(".user-text-list__head").append(" ["+q+"]");
+    });
     
-    //В основном работа с первым блоком (Template textarea)
+    
+//BLOK-1 В основном работа с первым блоком (Template textarea)
     //Обработка текста при начальной загрузке, если он есть
     let load_val = $(".js-main-textarea").val();
     WORK_AREA.val("");
@@ -48,9 +56,15 @@ function main_ready(){
     }
     
     //Template textarea содержит текст - разблокируется рабочее поле work textarea. Пуст - блокируется
-    let change_main_textarea = document.querySelector('.js-main-textarea');
-    change_main_textarea.oninput = function(){
+    $('.js-main').on('input' , '.js-main-textarea', function(){
         let val = $(".js-main-textarea").val();
+        let id   = $(".js_current-text-id").html();
+        let name = $(".js_main-name").val();
+        let area = $(".js_main-theme-name").val();
+        localStorage.setItem("id", id);
+        localStorage.setItem("name", name);
+        localStorage.setItem("area", area);
+        localStorage.setItem("text", val);
         
         if(val != false){
             WORK_AREA.removeAttr("disabled");
@@ -60,13 +74,14 @@ function main_ready(){
             WORK_AREA.attr("placeholder", "Сначала добавьте текст в верхнее поле");
             WORK_AREA.val("");
         }
-    }
-    
-    //Вызов функции удаления пробельных символов
-    $(".js-main-textarea").focusout(function(){
-        text_replace();
     });
     
+    //Вызов функции удаления пробельных символов
+    $(".js_section-template").on("focusout", ".js-main-textarea", function(){
+        let r_t = text_replace();
+        localStorage.setItem("text", r_t);
+    });
+//END BLOK-1
     
     
     
@@ -148,8 +163,10 @@ function main_ready(){
             
             tempText = $(".js-main-span").html();             
             tempText = tempText.replace(/\n+/g, "\n ");
+            
             //Разбиваем строку на массив
             tempWord = tempText.split(/[ \f\r\t\v\u00A0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u2028\u2029\u202f\u205f\u3000]/);
+            
             //Остаток текста - длина прошлого слова + 1 пробел, длина всего текста tempText
             tempResidue = tempText.slice(tempWord[0].length+1);
             tempResidue = tempResidue.replace(/\n\s+/g, "\n");
@@ -163,6 +180,7 @@ function main_ready(){
 //            console.log(tempWord[0][temp_word_l]);
             
             if(word["word"] === tempWord[0]){
+                
                 //Добавить пробел если нет \n
                 if(tempWord[0][temp_word_l] != "\n"){
                     z = tempWord[0]+" ";
@@ -174,11 +192,13 @@ function main_ready(){
             }else{
                 wrong_length = wrong_length + tempWord[0].length;
                 errors++;
+                
                 //Добавить пробел если нет \n
                 if(tempWord[0][temp_word_l] != "\n"){
                     z = "<span class='blue'>"+tempWord[0]+"</span> ";
                 }else{
                     z = "<span class='blue'>"+tempWord[0]+"</span>";
+                    
                     //При ошибке в слове с переносом строки, каретка в рабочей зоне переносится на следующую строку
                     let add_enter_in_work = $(".js-work-textarea").val();
                     $(".js-work-textarea").val(add_enter_in_work+"\n");
@@ -195,6 +215,12 @@ function main_ready(){
                 my_time = (end_time - start_time)/(1000*60);
                 my_minute = Math.floor(my_time);
                 my_second = Math.round( ((end_time - start_time)/1000) - my_minute*60 );
+                if(my_minute < 10){
+                   my_minute = "0"+my_minute;
+                }
+                if(my_second < 10){
+                   my_second = "0"+my_second;
+                }
                 
                 //Скорость набора в минуту
                 result_speed = (template_length - wrong_length)/my_time;
@@ -240,12 +266,6 @@ function main_ready(){
             WORK_AREA.val("");
             
             //Обнуление переменных.
-            //            startStr        = 0;
-            //            old_work        = "";
-            //            old_work_length = 0;
-            //            oldVal          = "";
-            //            oldLength       = 0;
-            //            errors          = 0;
             null_var();
         } else{
             alert("Поле для ввода уже разблокировано");
@@ -255,18 +275,21 @@ function main_ready(){
     
     
 //BLOK-4    Подгрузка и работа с текстами из базы
-    function ajaxQuery (id, clss){
+    function ajaxQuery (id, its_text, clss){
         $.ajax({
-            url: "controllers/get_text.php",
-            method: 'post',
+            url:    "ajax_user.php",
+            method: "post",
             data: {
-                id: id
+                id: id,
+                its_text: its_text
             },
             success: function(msg){
                 //                $(clss).html(msg);
                 $(clss).replaceWith("<textarea class='textarea main__textarea blue-neon-box js-main-textarea js-textarea' placeholder='Добавьте ваш текст в это окно или выберите текст из списка'>"+msg+"</textarea>");
+                
                 WORK_AREA.val("");
-                text_replace();
+                let result = text_replace();
+                localStorage.setItem("text", result);
                 
                 //Обнуление переменных.
                 null_var();
@@ -274,13 +297,93 @@ function main_ready(){
         });
     }
     
+    //Получение дефолтного текста
     $(".default-text-list").on("click", ".default-text-list__name", function(){
         let id = $(this).attr("data-id");
-        ajaxQuery(id, ".js-main-textarea");
+        let name = $(this).html();
+        let area = "Default";
+        ajaxQuery(id, "get_default_text", ".js-main-textarea");
         
         $('.js-work-textarea').removeAttr("disabled");
         $('.js-work-textarea').attr("placeholder", "Готовы приступать? :) \nШаблон блокируется на время теста.");
+        
+        localStorage.setItem("name", name);
+        localStorage.setItem("area", area);
+    });
+    
+    
+    //Получение пользовательского текста
+    $(".users-theme").on("click", ".user-text-list__name", function(){
+        let id   = $(this).attr("data-id");
+        let name = $(this).html();
+        let area = $(this).attr("data-area");
+        ajaxQuery(id, "get_user_text",".js-main-textarea");
+        
+        $('.js-work-textarea').removeAttr("disabled");
+        $('.js-work-textarea').attr("placeholder", "Готовы приступать? :) \nШаблон блокируется на время теста.");
+        $('.js_main-name').val(name);
+        $('.js_main-theme-name').val(area);
+        $('.current-text-id').html("ID:<span class='js_current-text-id'>"+id+"</span>");
+        
+        localStorage.setItem("id", id);
+        localStorage.setItem("name", name);
+        localStorage.setItem("area", area);
+        
+    });
+    
+
+    //При перезагрузке страницы вставляем старые данные
+    if (performance.navigation.type == 1) {
+        let r_id   = localStorage.getItem("id");
+        let r_name = localStorage.getItem("name");
+        let r_area = localStorage.getItem("area");
+        let r_text = localStorage.getItem("text");
+        if(typeof(r_text) != "undefined" && r_text !== null){
+            $('.js_main-name').val(r_name);
+            $('.js_main-theme-name').val(r_area);
+            $('.current-text-id').html("ID:<span class='js_current-text-id'>"+r_id+"</span>");
+            $(".js-main-textarea").replaceWith("<textarea class='textarea main__textarea blue-neon-box js-main-textarea js-textarea' placeholder='Добавьте ваш текст в это окно или выберите текст из списка'>"+r_text+"</textarea>");
+        }
+        
+        if(r_text != false){
+            WORK_AREA.removeAttr("disabled");
+            WORK_AREA.attr("placeholder", "Готовы приступать? :) \nШаблон блокируется на время теста.");
+        }else{
+            WORK_AREA.attr("disabled", "true");
+            WORK_AREA.attr("placeholder", "Сначала добавьте текст в верхнее поле");
+            WORK_AREA.val("");
+        }
+    }
+    
+//    window.onunload = function(){
+//        localStorage.clear();
+//    }
+    
+    //Случайный текст
+    $(".main-header-menu").on("click", ".js_get-random-text", function(){
+        let q = $(".select").find('.default-text-list__name').length;
+        
+        function getRandomInt(min, max) {
+          return Math.floor(Math.random() * (max - min)) + min;
+        }
+        let qwe = getRandomInt(0, q);
+
+        
+        alert(qwe);
+//        ajaxQuery(id, ".js-main-textarea");
     });
 //END BLOK-4
+    
+    
+//BLOK-5    Кнопка 'новый текст', очищаем все поля
+    $(".main-header-menu").on('click', '.js_clean-all', function(){
+        $('.js_main-name').val("");
+        $('.js_main-theme-name').val("");
+        $('.current-text-id').html("");
+        $(".js-main-textarea").val("");
+        localStorage.clear();
+        null_var();
+    });
+//END BLOK-5    
 }
 document.addEventListener("DOMContentLoaded", main_ready);

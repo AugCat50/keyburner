@@ -20,6 +20,7 @@
         <link rel="stylesheet" href="common.blocks/main/main.css">
         <link rel="stylesheet" href="common.blocks/statistics-section/statistics-section.css">
         <link rel="stylesheet" href="common.blocks/default-text-list/default-text-list.css">
+        <link rel="stylesheet" href="common.blocks/user-text-list/user-text-list.css">
         
         <link rel="stylesheet" href="common.blocks/footer/footer.css">
         
@@ -30,12 +31,15 @@
         
         <link rel="stylesheet" href="common.blocks/dialog/dialog.css">
         
+        <link rel="stylesheet" href="common.blocks/select/select.css">
+        
         <script src="js/jquery-3.5.1.min.js"></script>
         <script src="js/textarea_autosize.js"></script>
         <script src="js/main.js"></script>
         <script src="js/log_in.js"></script>
         <script src="js/check_in.js"></script>
-        <script src="js/default_text.js"></script>
+<!--        <script src="js/default_text.js"></script>-->
+        <script src="js/user.js"></script>
     </head>
     
     <body class="body">
@@ -43,26 +47,53 @@
             <div class="main-wrapper">
                 <header class="main-header">
                     <h1 class="h1 main-header_h1 bright-blue-neon">Keyburner</h1>
+                    <?php 
+                        require "controllers/component_session.php";
+//                        require "controllers/component_user.php";
+                        
+                        echo "<h2 class='h1 main-header_h2 pink-neon'>".$_SESSION['name']."</h2>";
+                    ?>
                     <menu class="main-header-menu">
                         <nav>
-                            <li class="blue-neon main-header-menu__item js_check-in__show"><span class='pointer'>&#187;</span> Регистрация</li>
-                            <li class="blue-neon main-header-menu__item js_authorization__show"><span class='pointer'>&#187;</span> Вход</li>
-<!--                            <li class="blue-neon main-header-menu__item"><span class='pointer'>&#187;</span> Добавить текст</li>-->
+                            <li class="blue-neon main-header-menu__item js_clean-all"><span class='pointer'>&#187;</span> Новый текст</li>
+<!--                            <li class="blue-neon main-header-menu__item"><span class='pointer'>&#187;</span> Выбрать текст</li>-->
+                            <li class="blue-neon main-header-menu__item js_get-random-text"><span class='pointer'>&#187;</span> Случайный текст</li>
+                            <li class="blue-neon main-header-menu__item js_desroy"><span class='pointer'>&#187;</span> <a class="link blue-neon" href="user.php?exit=exit">Выйти</a></li>
+                            <li class="blue-neon-box main-header-menu__item search">
+                                <input class="search__input js_search" type="text" placeholder="Поиск">
+                                <button class="search__go blue-neon" title="Искать" label="Искать">&#10140;</button>
+                            </li>
                         </nav>
                     </menu>
-                    <ul class="default-text-list">
-                        <h3 class="default-text-list__head pink-neon">Быстрый старт:</h3>
+<!--                    <div class="neon-line"></div>-->
+                    
+                    <h2 class='h1 main-header_h2 pink-neon'>Ваши темы:</h2>
+<!--                    <p class="blue-neon main-header-menu__item js_get-random-text-user"><span class='pointer'>&#187;</span> Случайный текст</p>-->
+                    <div class="users-theme">
                         <?php
-                            require_once "controllers/show_default_text.php";
-                            foreach($data as $val){
-                                echo "<li class='default-text-list__name blue-neon' data-id=".$val['id']."><span class='pointer'>&#187;</span> " . $val['name'] . "</li>";
-                            }
+                            require "controllers/component_user_get_name_texts.php";
+                            echo $result;
                         ?>
-                    </ul>
+                    </div>
+                    
+                    <div class="default-text-list">
+                        <h3 class="default-text-list__head pink-neon">Быстрый старт:</h3>
+                        <div class="select__wrapper blue-neon-box">
+                            <span class="select__arrow">&#9660;</span>
+                            <select class="select">
+                                <?php
+                                    require_once "controllers/component_default_get_name_texts.php";
+                                    foreach($data as $val){
+                                        echo "<option class='default-text-list__name select__option blue-neon' data-id=".$val['id'].">" . $val['name'] . "</option>";
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                        <p class="blue-neon main-header-menu__item js_get-random-text-default"><span class='pointer'>&#187;</span> Случайный текст</p>
+                    </div>
                 </header> 
                 
                 <main class="main js-main">
-                    
                     <section class="section statistics-section main__statistics">
                         <div class="statistics-section__item first">
                             <span class="bright-blue-neon">Последний результат:</span>
@@ -87,7 +118,14 @@
                         <div class="statistics-section__item blue-neon last"><span class="">(симв. в мин.)</span></div>
                     </section>
                     
-                    <section class="section main__section">
+                    <section class="section main__head main__section">
+                        <input class="main__name blue-neon-box js_main-name" type="text" placeholder="Название">
+                        <input class="main__theme-name blue-neon-box js_main-theme-name" type="text" placeholder="Тема">
+                        <p class="current-text-id pink-neon"></p>
+                    </section>
+                    <p class="message pink-neon">Привет!</p>
+                    
+                    <section class="section main__section js_section-template">
                         <textarea class="textarea main__textarea blue-neon-box js-main-textarea js-textarea" placeholder='Добавьте ваш текст в это окно или выберите текст из списка'></textarea>
                     </section>
                     
@@ -95,8 +133,13 @@
                         <textarea class="textarea main__textarea main__work-textarea blue-neon-box js-work-textarea js-textarea" placeholder='Сначала добавьте текст в верхнее поле' autofocus disabled></textarea>
                     </section>
                     
-                    <button class="button test-button" id="test">Test</button>
-                    <button class="button js-replaceWith">Edit text</button>
+                    
+<!--                    <button class="button pink-neon pink-neon-box js-replaceWith">Редактировать</button>-->
+                    
+                    
+                    <button class="button main__button pink-neon pink-neon-box js-del" title="Удалить"><img src="img/del.png" class="main__ico"></button>
+                    <button class="button main__button pink-neon pink-neon-box save-button js_add-text" title="Сохранить"><img src="img/save.png" class="main__ico main__ico-save"></button>
+                    <button class="button main__button main__button-edit pink-neon pink-neon-box js-replaceWith" title="Редактировать"><img src="img/edit.png" class="main__ico"></button>
                 </main>
             </div>
             
@@ -109,31 +152,6 @@
             </footer>
         </div>
         
-        <dialog class="dialog authorization">
-            <div class="dialog__display">
-                <form class="dialog__form" method="post">
-                    <h3 class="dialog__h bright-blue-neon">Авторизация</h3>
-                    <input name="user" class="dialog__input blue-neon-box js_log-in-name" type="text" placeholder="Login">
-                    <input name="password" class="dialog__input blue-neon-box js_log-in-password" type="password" placeholder="Password">
-                    <div class="dialog__message pink-neon"></div>
-                    <button class="button dialog__button js_log-in-ready">Войти</button>
-                    <button class="button dialog__button js_authorization__hide">Отмена</button>
-                </form>
-            </div>
-        </dialog>
-        <dialog class="dialog check-in">
-            <div class="dialog__display">
-                <form class="dialog__form" method="post">
-                    <h3 class="dialog__h bright-blue-neon">Регистрация</h3>
-                    <input name="user" class="dialog__input blue-neon-box" type="text" placeholder="Login">
-                    <input name="password" class="dialog__input blue-neon-box" type="text" placeholder="Password">
-                    <input name="password-2" class="dialog__input blue-neon-box" type="text" placeholder="Password">
-                    <input name="mail" class="dialog__input blue-neon-box" type="email" placeholder="Email">
-                    <button class="button dialog__button">Регистрация</button>
-                    <button class="button dialog__button js_check-in__hide">Отмена</button>
-                </form>
-            </div>
-        </dialog>
         <?php require_once "controllers/component_activation.php"?>
     </body>
 </html>

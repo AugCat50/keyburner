@@ -2,7 +2,7 @@
 function check_in(){
     function ajax_query_check_in(name, pass_1, pass_2, mail){
         $.ajax({
-            url:    "controllers/component_check-in.php",
+            url:    "ajax_check_in.php",
             method: "post",
             data:{
                 name:   name,
