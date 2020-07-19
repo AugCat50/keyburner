@@ -85,13 +85,44 @@
         $query = "SELECT text FROM texts WHERE id = $id";
         
         try{
-            $text = $pdo->query($query);
+            $text    = $pdo->query($query);
             $content = $text->fetch();
-            $data = $content["text"];
+            $data    = $content["text"];
         }catch(PDOException $e){
             $data = "Ошибка в get_one_user_text: " . $e->getMessage() . "<br>";
         }
         
+        return $data;
+    }
+    
+    
+    //Поиск по ключевому слову в названиях и текстах
+    function search_user_texts($pdo, $search_word){
+        $search_word = "%".$search_word."%";
+        $id          = $_SESSION['id'];
+        try{
+            
+            $query = "SELECT id, area, name 
+                    FROM texts 
+                    WHERE id_user = :id AND name LIKE :search 
+                    OR id_user = :id AND text LIKE :search";
+            $stmt = $pdo->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':search', $search_word);
+            $stmt->execute();
+            
+            for($i=0; $text = $stmt->fetch(); $i++){
+                $data["text $i"]["id"]   = $text["id"];
+                $data["text $i"]["area"] = $text["area"];
+                $data["text $i"]["name"] = $text["name"];
+            }
+        }catch(PDOException $e){
+            $data = "Ошибка в search_user_texts: " . $e->getMessage() . "<br>";
+        }
+        
+        if(!isset($data)){
+            $data = "Ничего не найдено!";
+        }
         return $data;
     }
     

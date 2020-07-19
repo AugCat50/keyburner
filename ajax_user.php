@@ -24,6 +24,7 @@
     if(isset($data) && is_array($data)){
         foreach($data as $value){
             echo $value;
+//            print_r($value);
         }
     }else if(isset($data)){
         echo $data;

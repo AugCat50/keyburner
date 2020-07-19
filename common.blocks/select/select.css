@@ -23,7 +23,7 @@
     position: relative;
     cursor: pointer;
 /*    width: 100%;*/
-    width: 225px;
+    width: 220px;
     text-overflow: ellipsis;
 }
 

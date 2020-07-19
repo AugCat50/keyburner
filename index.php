@@ -46,6 +46,7 @@
                     <menu class="main-header-menu">
                         <nav>
                             <li class="blue-neon main-header-menu__item js_clean-all"><span class='pointer'>&#187;</span> Новый текст</li>
+                            <li class="blue-neon main-header-menu__item js_get-random-text-default"><span class='pointer'>&#187;</span> Случайный текст</li>
                             <li class="blue-neon main-header-menu__item js_check-in__show"><span class='pointer'>&#187;</span> Регистрация</li>
                             <li class="blue-neon main-header-menu__item js_authorization__show"><span class='pointer'>&#187;</span> Вход</li>
 <!--                            <li class="blue-neon main-header-menu__item"><span class='pointer'>&#187;</span> Добавить текст</li>-->
@@ -56,7 +57,7 @@
                         <?php
                             require_once "controllers/component_default_get_name_texts.php";
                             foreach($data as $val){
-                                echo "<li class='default-text-list__name blue-neon' data-id=".$val['id']."><span class='pointer'>&#187;</span> " . $val['name'] . "</li>";
+                                echo "<li class='default-text-list__name blue-neon' data-id=".$val['id']."><span class='pointer'>&#187; </span><span class='js_value'>" . $val['name'] . "</span></li>";
                             }
                         ?>
                     </ul>

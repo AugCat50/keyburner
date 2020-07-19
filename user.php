@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" class="html">
+<html lang="ru" class="html user">
     <head>
         <meta charset="utf-8">
         <meta name="description" content="Тренажёр слепого набора">
@@ -38,7 +38,6 @@
         <script src="js/main.js"></script>
         <script src="js/log_in.js"></script>
         <script src="js/check_in.js"></script>
-<!--        <script src="js/default_text.js"></script>-->
         <script src="js/user.js"></script>
     </head>
     
@@ -50,41 +49,44 @@
                     <?php 
                         require "controllers/component_session.php";
 //                        require "controllers/component_user.php";
-                        
                         echo "<h2 class='h1 main-header_h2 pink-neon'>".$_SESSION['name']."</h2>";
                     ?>
                     <menu class="main-header-menu">
                         <nav>
                             <li class="blue-neon main-header-menu__item js_clean-all"><span class='pointer'>&#187;</span> Новый текст</li>
-<!--                            <li class="blue-neon main-header-menu__item"><span class='pointer'>&#187;</span> Выбрать текст</li>-->
                             <li class="blue-neon main-header-menu__item js_get-random-text"><span class='pointer'>&#187;</span> Случайный текст</li>
                             <li class="blue-neon main-header-menu__item js_desroy"><span class='pointer'>&#187;</span> <a class="link blue-neon" href="user.php?exit=exit">Выйти</a></li>
-                            <li class="blue-neon-box main-header-menu__item search">
-                                <input class="search__input js_search" type="text" placeholder="Поиск">
-                                <button class="search__go blue-neon" title="Искать" label="Искать">&#10140;</button>
+                            <li class="blue-neon-box main-header-menu__item search js_search">
+                                <input class="search__input js_search-word" type="text" placeholder="Поиск">
+                                <button class="search__go blue-neon js_search-button" title="Искать" label="Искать">&#10140;</button>
                             </li>
                         </nav>
+                        <ul class="serch-result users-theme blue-neon-box js_serch-result"></ul>
                     </menu>
-<!--                    <div class="neon-line"></div>-->
                     
-                    <h2 class='h1 main-header_h2 pink-neon'>Ваши темы:</h2>
-<!--                    <p class="blue-neon main-header-menu__item js_get-random-text-user"><span class='pointer'>&#187;</span> Случайный текст</p>-->
-                    <div class="users-theme">
-                        <?php
-                            require "controllers/component_user_get_name_texts.php";
-                            echo $result;
-                        ?>
+                    
+<!--<div class="neon-line"></div>-->
+                    
+                    <div class="users-theme-wrapper blue-neon-box">
+                        <h2 class='h1 main-header_h2 pink-neon'>Ваши темы:</h2>
+                        <!--<p class="blue-neon main-header-menu__item js_get-random-text-user"><span class='pointer'>&#187;</span> Случайный текст</p>-->
+                        <div class="users-theme">
+                            <?php
+                                require "controllers/component_user_get_name_texts.php";
+                                echo $result;
+                            ?>
+                        </div>
                     </div>
                     
-                    <div class="default-text-list">
-                        <h3 class="default-text-list__head pink-neon">Быстрый старт:</h3>
+                    <div class="default-text-list blue-neon-box">
+                        <h2 class="default-text-list__head main-header_h2 pink-neon">Быстрый старт:</h2>
                         <div class="select__wrapper blue-neon-box">
                             <span class="select__arrow">&#9660;</span>
                             <select class="select">
                                 <?php
                                     require_once "controllers/component_default_get_name_texts.php";
                                     foreach($data as $val){
-                                        echo "<option class='default-text-list__name select__option blue-neon' data-id=".$val['id'].">" . $val['name'] . "</option>";
+                                        echo "<option class='default-text-list__name select__option blue-neon' data-id=".$val['id']."><span class='js_value'>" . $val['name'] . "</span></option>";
                                     }
                                 ?>
                             </select>
@@ -131,11 +133,7 @@
                     
                     <section class="section main__section">
                         <textarea class="textarea main__textarea main__work-textarea blue-neon-box js-work-textarea js-textarea" placeholder='Сначала добавьте текст в верхнее поле' autofocus disabled></textarea>
-                    </section>
-                    
-                    
-<!--                    <button class="button pink-neon pink-neon-box js-replaceWith">Редактировать</button>-->
-                    
+                    </section>        
                     
                     <button class="button main__button pink-neon pink-neon-box js-del" title="Удалить"><img src="img/del.png" class="main__ico"></button>
                     <button class="button main__button pink-neon pink-neon-box save-button js_add-text" title="Сохранить"><img src="img/save.png" class="main__ico main__ico-save"></button>

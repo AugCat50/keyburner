@@ -300,8 +300,9 @@ function main_ready(){
     //Получение дефолтного текста
     $(".default-text-list").on("click", ".default-text-list__name", function(){
         let id = $(this).attr("data-id");
-        let name = $(this).html();
+        let name = $(this).children(".js_value").html();
         let area = "Default";
+        
         ajaxQuery(id, "get_default_text", ".js-main-textarea");
         
         $('.js-work-textarea').removeAttr("disabled");
@@ -317,6 +318,13 @@ function main_ready(){
         let id   = $(this).attr("data-id");
         let name = $(this).html();
         let area = $(this).attr("data-area");
+        
+        //Удаление лишнего при клике по результатам поиска
+        let index = name.indexOf(" --");
+        if(index != -1){
+            name = name.slice(0, index);
+        }
+        
         ajaxQuery(id, "get_user_text",".js-main-textarea");
         
         $('.js-work-textarea').removeAttr("disabled");

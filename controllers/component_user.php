@@ -24,6 +24,28 @@
         //$result содержит результат работы component_user_get_name_texts , а именно html блока "Ваши темы"
         $data = "<span>" . $answer . "</span>" . $result;
         
+    }else if($_POST["operation"] == "search"){
+        //В $_POST["text"] содержится search_word
+        $answer = search_user_texts($pdo, $_POST["text"]);
+        
+        if(isset($answer) && is_array($answer)){
+            $data = "<h4 class='user-text-list__head bright-blue-neon'>Результаты поиска:</h4>
+                <div class='select__wrapper blue-neon-box'>
+                    <span class='select__arrow'>&#9660;</span>
+                    <select class='select'>";
+            
+            $size_ans = count($answer);
+            for($i=0; $i < $size_ans; $i++){
+                $id    = $answer["text $i"]["id"];
+                $area  = $answer["text $i"]["area"];
+                $name  = $answer["text $i"]["name"];
+                $data  = $data."<option class='user-text-list__name select__option blue-neon' data-id=".$id." data-area=".$area.">".$name." -- ".$area."  ID:".$id."</option>";
+            }
+            $data = $data."</select></div></ul><button class='button saerch-close pink-neon-box js_saerch-close'>&#215;</button>";
+        }else{
+            $data = $answer."<button class='button saerch-close pink-neon-box js_saerch-close'>&#215;</button>";
+        }
+        
     }else{
         print_r($_POST);
     }

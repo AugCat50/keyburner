@@ -25,7 +25,7 @@ function user(){
                 text:      text
             },
             success: function (data){
-                if(operation){
+                if(operation && operation != 'search'){
                     //В ответ приходит строка ответа из модели и html отрисовки нового меню. Разделяем ответ и код и отрисовываем в их местах
                     let index = data.indexOf("</span>") + 7;
                     let answer = data.slice(0, index);
@@ -39,9 +39,13 @@ function user(){
                         let q = $(this).find('.select__option').length;
                         $(this).children(".user-text-list__head").append(" ["+q+"]");
                     });
-                }else{
+                }else {
                     $(clss).html(data).show();
                 }
+                
+//                if(operation && operation == 'search'){
+//                    $('js_serch-result').html(data);
+//                } else
             },
             error: function (data){
                 $(clss).html(data).show();
@@ -87,9 +91,32 @@ function user(){
             localStorage.clear();
         }
     });
+
     
     
+    //Поиск
+    $('.search').on('click', '.js_search-button', function(){
+        let search_word = $('.js_search-word').val();
+        if(search_word != undefined && search_word != ""){
+           ajaxUser(false, "search", false, false, search_word, ".js_serch-result");
+        }
+    });
     
+    //Поиск нажатием Enter
+    $('.js_search-word').keypress(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13'){
+            let search_word = $('.js_search-word').val();
+            if(search_word != undefined && search_word != ""){
+               ajaxUser(false, "search", false, false, search_word, ".js_serch-result");
+            }
+        }
+    });
+    
+    $('.js_serch-result').on('click', '.js_saerch-close', function(){
+        $('.js_serch-result').hide();
+        $('.js_search-word').val("");
+    });
     
     
     
