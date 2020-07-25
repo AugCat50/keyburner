@@ -25,11 +25,12 @@ function user(){
                 text:      text
             },
             success: function (data){
+                
                 if(operation && operation != 'search'){
                     //В ответ приходит строка ответа из модели и html отрисовки нового меню. Разделяем ответ и код и отрисовываем в их местах
-                    let index = data.indexOf("</span>") + 7;
+                    let index  = data.indexOf("</span>") + 7;
                     let answer = data.slice(0, index);
-                    let html = data.slice(index);
+                    let html   = data.slice(index);
                     
                     $(clss).html(answer).show();
                     $('.users-theme').html(html);
@@ -40,12 +41,17 @@ function user(){
                         $(this).children(".user-text-list__head").append(" ["+q+"]");
                     });
                 }else {
+                    //Код вывода ответа на запрос поиска
                     $(clss).html(data).show();
+                    $(clss).attr('search_attr', text);
+                    
+                    //Количество текстов найдено
+                    $(clss).each(function () {
+                        let q = $(this).find('.select__option').length;
+                        $(this).children(".user-text-list__head").append(" ["+q+"]");
+                    });
                 }
                 
-//                if(operation && operation == 'search'){
-//                    $('js_serch-result').html(data);
-//                } else
             },
             error: function (data){
                 $(clss).html(data).show();
@@ -59,7 +65,11 @@ function user(){
         let name  = $(".js_main-name").val();
         let theme = $(".js_main-theme-name").val();
         let text  = $(".js-main-textarea").val();
-        if(name == false){
+        
+        if($(".js_main-theme-name").attr('data') === "Default"){
+            $(".message").html("Нельзя добавлять, менять, удалять стандартные тексты.<br> Тема 'Default' зарезервирована.").show();
+            return;
+        }else if(name == false){
             $(".message").html("Заполните имя!").show();
             return;
         }else if(theme == false){
@@ -76,29 +86,43 @@ function user(){
         }else{
             ajaxUser(false, "add", name, theme, end_text, ".message");
         }
-        
     });
     
     //Удалить текст
     $(".js-main").on("click", ".js-del", function(){
-        let id   = $('.js_current-text-id').html();
+        let id         = $('.js_current-text-id').html();
+        let theme      = $(".js_main-theme-name");
+        let theme_name = theme.val();
+        //В случае, если текст дефолтный, но пользователь изменил val в input темы, берём значение для проверки из атрибута
+        let theme_attr = theme.attr('data');
+        
+        
         if(id){
             ajaxUser(id, "del", false, false, false, ".message");
             $('.js_main-name').val("");
-            $('.js_main-theme-name').val("");
+            theme.val("");
             $('.current-text-id').html("");
             $(".js-main-textarea").val("");
             localStorage.clear();
+        }else if(!id && theme_attr === "Default"){
+            $(".message").html("Нельзя удалять стандартные тексты!").show();
+        }else{
+            $(".message").html("Не удалось получить ID текста. Обратитесь к администратору").show();
         }
     });
-
     
     
     //Поиск
     $('.search').on('click', '.js_search-button', function(){
+        let result_box  = $('.js_serch-result');
         let search_word = $('.js_search-word').val();
-        if(search_word != undefined && search_word != ""){
-           ajaxUser(false, "search", false, false, search_word, ".js_serch-result");
+        let search_attr = result_box.attr('search_attr');
+        
+        if(search_attr === search_word){
+            //Если данное ключевое слово уже запрашивалось и результаты уже есть, просто показываем
+            result_box.show();
+        }else if(search_word != undefined && search_word != ""){
+            ajaxUser(false, "search", false, false, search_word, ".js_serch-result");
         }
     });
     
@@ -106,9 +130,15 @@ function user(){
     $('.js_search-word').keypress(function(event){
         var keycode = (event.keyCode ? event.keyCode : event.which);
         if(keycode == '13'){
+            let result_box  = $('.js_serch-result');
             let search_word = $('.js_search-word').val();
-            if(search_word != undefined && search_word != ""){
-               ajaxUser(false, "search", false, false, search_word, ".js_serch-result");
+            let search_attr = result_box.attr('search_attr');
+            
+            if(search_attr === search_word){
+                //Если данное ключевое слово уже запрашивалось и результаты уже есть, просто показываем
+                result_box.show();
+            }else if(search_word != undefined && search_word != ""){
+                ajaxUser(false, "search", false, false, search_word, ".js_serch-result");
             }
         }
     });
@@ -117,15 +147,5 @@ function user(){
         $('.js_serch-result').hide();
         $('.js_search-word').val("");
     });
-    
-    
-    
-    
-    
-//    $(".main-header-menu").on("click", ".js_desroy", function(){
-//        $.ajax({
-//            url:"";
-//        });
-//    })
 }
 document.addEventListener("DOMContentLoaded", user);

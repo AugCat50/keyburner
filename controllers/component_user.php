@@ -32,14 +32,21 @@
             $data = "<h4 class='user-text-list__head bright-blue-neon'>Результаты поиска:</h4>
                 <div class='select__wrapper blue-neon-box'>
                     <span class='select__arrow'>&#9660;</span>
-                    <select class='select'>";
+                    <select class='select js_select'>";
             
             $size_ans = count($answer);
             for($i=0; $i < $size_ans; $i++){
                 $id    = $answer["text $i"]["id"];
                 $area  = $answer["text $i"]["area"];
                 $name  = $answer["text $i"]["name"];
-                $data  = $data."<option class='user-text-list__name select__option blue-neon' data-id=".$id." data-area=".$area.">".$name." -- ".$area."  ID:".$id."</option>";
+                $opt_v = $name." -- ".$area." ID:".$id;
+                $data  = $data."<option 
+                                    class='user-text-list__name select__option blue-neon' 
+                                    data-id='".$id."' 
+                                    data-area='".$area."'
+                                    name='".$opt_v."'>"
+                                    .$opt_v.
+                                "</option>";
             }
             $data = $data."</select></div></ul><button class='button saerch-close pink-neon-box js_saerch-close'>&#215;</button>";
         }else{

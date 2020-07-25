@@ -49,7 +49,7 @@ function main_ready(){
     //Обработка текста при начальной загрузке, если он есть
     let load_val = $(".js-main-textarea").val();
     WORK_AREA.val("");
-    if(load_val != false){
+    if(load_val != false && load_val !== null){
         text_replace();
         WORK_AREA.removeAttr("disabled");
         WORK_AREA.attr("placeholder", "Готовы приступать? :) \nШаблон блокируется на время теста.");
@@ -100,10 +100,11 @@ function main_ready(){
     
     //template_length -- Длина шаблонного текста, определяется при блокировке шаблонного текста
     //start_time      -- время начала, определяется при блокировке шаблонного текста
-    let start_time = 0, end_time = 0;
+    let start_time      = 0; 
+    let end_time        = 0;
     let template_length = 0;
-    let wrong_length = 0;
-    let errors = 0;
+    let wrong_length    = 0;
+    let errors          = 0;
     
     let change_work_textarea     = document.querySelector('.js-work-textarea');
     change_work_textarea.oninput = function(e){
@@ -212,7 +213,7 @@ function main_ready(){
                 end_time = new Date;
                 
                 //Время в минутах
-                my_time = (end_time - start_time)/(1000*60);
+                my_time   = (end_time - start_time)/(1000*60);
                 my_minute = Math.floor(my_time);
                 my_second = Math.round( ((end_time - start_time)/1000) - my_minute*60 );
                 if(my_minute < 10){
@@ -223,15 +224,48 @@ function main_ready(){
                 }
                 
                 //Скорость набора в минуту
-                result_speed = (template_length - wrong_length)/my_time;
+                result_speed  = (template_length - wrong_length)/my_time;
                 penalty_speed = result_speed - template_length/my_time;
+                result_speed  = result_speed.toFixed(3);
                 
                 $(".js-minute").html(("0"+my_minute).slice(-2));
                 $(".js-second").html(my_second);
-                $(".js-speed").html(result_speed.toFixed(3));
+                $(".js-speed").html(result_speed);
                 $(".js-errors").html(errors);
                 $(".js-penalty").html(penalty_speed.toFixed(3));
                 
+                
+                //Отправка-получение статистики
+                let stat_id = $('.js_current-text-id').html();
+                
+                function ajax_statistics(id, time, speed){
+                    let stat_time = time.getDate() +"."+ time.getMonth() +"."+ time.getFullYear();
+                    
+                    $.ajax({
+                        url:    "ajax_statistics.php",
+                        method: "post",
+                        data:{
+                            id:     id,
+                            time:   stat_time,
+                            speed:  speed
+                        },
+                        success: function (data){
+                            $('.message').html(data);
+                            $('.message').show();
+                        },
+                        error: function (data){
+                            $('.message').html(data);
+                            $('.message').show();
+                        }
+                    });
+                }
+                
+                
+                if(stat_id != undefined && stat_id != ""){
+                    let qwe = ajax_statistics(stat_id, end_time, result_speed);
+//                    alert(stat_id+"---"+end_time+"---"+result_speed);
+//                    alert (qwe);
+                }
                 //                console.log(my_time);
                 //                console.log(my_minute+":"+my_second);
                 //                console.log(errors);
@@ -298,62 +332,142 @@ function main_ready(){
     }
     
     //Получение дефолтного текста
-    $(".default-text-list").on("click", ".default-text-list__name", function(){
-        let id = $(this).attr("data-id");
-        let name = $(this).children(".js_value").html();
-        let area = "Default";
+    /*
+        Как обойти отсутствие ивента клик по <select><option></option></select> в браузерах на движке хрома. 
+        Как это работает в нормальных браузерах - есть просто ивент клик и ты можешь получить любые атрибуты элемента option по которому ты кликнул. Доступ ко всем данным одним кликом, удобненько.
         
-        ajaxQuery(id, "get_default_text", ".js-main-textarea");
+        Как это работает в хром подобных браузерах. Ивента клик по option нет, и соответственно получить доступ к нему напрямую ты никак не можешь. Но можно обойти это невъебаться хитрым образом. Есть ивент клик по самому <select>. Это значит, можно получить доступ к данным самого селекта. У выпадающего списка есть такой параметр val() - значение выбранного элемента, а именно - это текст внутри <option></option>. За это можно зацепиться, если этот же текст добавить в какой-то артибут самого тэга. Селектором атрибута, в который подставляешь текст из val() можно получить доступ к самому option, по которому кликнули, и извлечь уже из него данные. Но это ещё не всё, ведь когда ты открываешь список - это один клик, а когда кликаешь по пункту списка - это уже второй клик. А надо обрабатывать только второй. Поэтому по первому клику, надо добавлять к select флаг, например класс 'open' и получать val() только когда флаг есть. После выполнения кода флаг удаляется. И в итоге, вся эта схема работает как простой ивент клик в нормальных браузерах.
         
-        $('.js-work-textarea').removeAttr("disabled");
-        $('.js-work-textarea').attr("placeholder", "Готовы приступать? :) \nШаблон блокируется на время теста.");
+        change, :selected использовать нельзя, поскольку не будет обрабатываться клик по уже выбранному пункту списка.
+    */
+    $(".default-select").click(function(){
+        let my_this = $(this);
         
-        localStorage.setItem("name", name);
-        localStorage.setItem("area", area);
+        //Если флаг уже есть, то это клик по <option> внутри списка, а згачит можно получить val селекта
+        if(my_this.hasClass('opened')){
+            let name      = my_this.val();
+            //Получаем элемент по селектору типа $("[attr = 'val']")
+            let my_option = $('[name = "'+name+'"]');
+            let id        = my_option.attr("data-id");
+            let area      = "Default";
+            
+            ajaxQuery(id, "get_default_text", ".js-main-textarea");
+            
+            //Заполняем данными поля "Имя", "Тема", атрибут data инпута "Тема", затираем ID
+            $('.js_main-name').val(name);
+            $('.js_main-theme-name').val(area);
+            $('.js_main-theme-name').attr('data', area);
+            $('.js_current-text-id-wrapper').html('');
+            
+            $('.js-work-textarea').removeAttr("disabled");
+            $('.js-work-textarea').attr("placeholder", "Готовы приступать? :) \nШаблон блокируется на время теста.");
+            
+            //localStorage необходимо очистить, на случай если там сохранён ID пользовательского текста
+            localStorage.clear();
+            localStorage.setItem("name", name);
+            localStorage.setItem("area", area);
+            localStorage.setItem("area-attr", area);
+            //Код выполнен, удаляем флаг
+            my_option.removeClass('opened');
+        }else{
+            //Если флага нет, то это первый клик по списку, раскрывающий его. Добавляем флаг к <select>
+            my_this.addClass('opened');
+        }
+    });
+    
+    //При клике по документу вне раскрытого <select> удаляем класс opened у выпадающих списков
+    $(document).click(function(e){
+        let select = $('.select');
+        
+        if(!select.is(e.target)){
+            select.removeClass('opened');
+        }
     });
     
     
-    //Получение пользовательского текста
-    $(".users-theme").on("click", ".user-text-list__name", function(){
-        let id   = $(this).attr("data-id");
-        let name = $(this).html();
-        let area = $(this).attr("data-area");
+    //Получение пользовательского текста и текста из поиска. По аналогии с дефолтным, см выше
+    //Search не ищет в дефолтных текстах. Но эту возможность можно добавить, поэтому я решил не убирать проверки.
+    $(".js_users-theme, .js_serch-result").on("click", ".js_select", function(){
+        let my_this = $(this);
         
-        //Удаление лишнего при клике по результатам поиска
-        let index = name.indexOf(" --");
-        if(index != -1){
-            name = name.slice(0, index);
-        }
-        
-        ajaxQuery(id, "get_user_text",".js-main-textarea");
-        
-        $('.js-work-textarea').removeAttr("disabled");
-        $('.js-work-textarea').attr("placeholder", "Готовы приступать? :) \nШаблон блокируется на время теста.");
-        $('.js_main-name').val(name);
-        $('.js_main-theme-name').val(area);
-        $('.current-text-id').html("ID:<span class='js_current-text-id'>"+id+"</span>");
-        
-        localStorage.setItem("id", id);
-        localStorage.setItem("name", name);
-        localStorage.setItem("area", area);
-        
+        //Если флаг уже есть, то это клик по <option> внутри списка, а згачит можно получить val селекта
+        if(my_this.hasClass('opened')){
+            let name      = my_this.val();
+            //Получаем элемент по селектору типа $("[attr = 'val']")
+            let my_option = $('[name = "'+name+'"]');
+            let id        = my_option.attr("data-id");
+            let area      = my_option.attr("data-area");
+            
+            //Удаление лишнего при клике по результатам поиска
+            let index = name.indexOf(" --");
+            if(index != -1){
+                name = name.slice(0, index);
+            }
+            
+            ajaxQuery(id, "get_user_text",".js-main-textarea");
+            
+            //Удалить атрибут data='Default', защищающий стандартнные тексты от изменения
+            $('.js_main-theme-name').removeAttr('data');
+            
+            //Заполняем данными поля "Имя", "Тема", атрибут data инпута "Тема", затираем ID
+            $('.js-work-textarea').removeAttr("disabled");
+            $('.js-work-textarea').attr("placeholder", "Готовы приступать? :) \nШаблон блокируется на время теста.");
+            $('.js_main-name').val(name);
+            $('.js_main-theme-name').val(area);
+            
+            
+            //Если в поиске дефолтный текст, добавляем атрибут маркер data='Default' инпуту "Тема" и не выводим ID
+            if(area !== "Default"){
+                $('.js_current-text-id-wrapper').html("ID:<span class='js_current-text-id'>"+id+"</span>");
+            }else{
+                $('.js_current-text-id-wrapper').html("");
+                $('.js_main-theme-name').attr('data', 'Default');
+            }
+            
+            localStorage.clear();
+            
+            //Если в поиске дефолтный текст, сохраняем маркер area-attr='Default' и не сохраняем ID
+            if(area !== "Default"){
+                localStorage.setItem("id", id);
+            }else{
+                localStorage.setItem("area-attr", area);
+            }
+            
+            localStorage.setItem("name", name);
+            localStorage.setItem("area", area);
+            
+            my_option.removeClass('opened');
+        }else{
+            //Если флага нет, то это первый клик по списку, раскрывающий его. Добавляем флаг к <select>
+            my_this.addClass('opened');
+        }        
     });
     
 
     //При перезагрузке страницы вставляем старые данные
     if (performance.navigation.type == 1) {
-        let r_id   = localStorage.getItem("id");
-        let r_name = localStorage.getItem("name");
-        let r_area = localStorage.getItem("area");
-        let r_text = localStorage.getItem("text");
-        if(typeof(r_text) != "undefined" && r_text !== null){
+        let r_id    = localStorage.getItem("id");
+        let r_name  = localStorage.getItem("name");
+        let r_area  = localStorage.getItem("area");
+        let r_ar_at = localStorage.getItem("area-attr");
+        let r_text  = localStorage.getItem("text");
+        
+        if(typeof(r_text) != "undefined" && r_text !== null && r_text != ""){
             $('.js_main-name').val(r_name);
             $('.js_main-theme-name').val(r_area);
-            $('.current-text-id').html("ID:<span class='js_current-text-id'>"+r_id+"</span>");
+            
+            if(r_id){
+                $('.current-text-id').html("ID:<span class='js_current-text-id'>"+r_id+"</span>");
+            }
+            
+            if(r_ar_at){
+                $('.js_main-theme-name').attr('data', r_ar_at);
+            }
+            
             $(".js-main-textarea").replaceWith("<textarea class='textarea main__textarea blue-neon-box js-main-textarea js-textarea' placeholder='Добавьте ваш текст в это окно или выберите текст из списка'>"+r_text+"</textarea>");
         }
         
-        if(r_text != false){
+        if(r_text != false && r_text !== null){
             WORK_AREA.removeAttr("disabled");
             WORK_AREA.attr("placeholder", "Готовы приступать? :) \nШаблон блокируется на время теста.");
         }else{
@@ -363,9 +477,6 @@ function main_ready(){
         }
     }
     
-//    window.onunload = function(){
-//        localStorage.clear();
-//    }
     
     //Случайный текст
     $(".main-header-menu").on("click", ".js_get-random-text", function(){
@@ -375,9 +486,6 @@ function main_ready(){
           return Math.floor(Math.random() * (max - min)) + min;
         }
         let qwe = getRandomInt(0, q);
-
-        
-        alert(qwe);
 //        ajaxQuery(id, ".js-main-textarea");
     });
 //END BLOK-4

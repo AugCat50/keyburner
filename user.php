@@ -5,7 +5,7 @@
         <meta name="description" content="Тренажёр слепого набора">
         <meta name="keywords" content="Keyburner, Тренажёр слепого набора">
         <meta name="autor" content="draackul2@gmail.com">
-        <meta name="viewport" content="width=device-width; initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Keyburner - Тренажёр слепого набора</title>
         
         <link rel="shortcut icon" type="image/svg" href="img/favicon.jpg"/>
@@ -61,7 +61,7 @@
                                 <button class="search__go blue-neon js_search-button" title="Искать" label="Искать">&#10140;</button>
                             </li>
                         </nav>
-                        <ul class="serch-result users-theme blue-neon-box js_serch-result"></ul>
+                        <ul class="serch-result users-theme blue-neon-box js_serch-result" search_attr=""></ul>
                     </menu>
                     
                     
@@ -70,7 +70,7 @@
                     <div class="users-theme-wrapper blue-neon-box">
                         <h2 class='h1 main-header_h2 pink-neon'>Ваши темы:</h2>
                         <!--<p class="blue-neon main-header-menu__item js_get-random-text-user"><span class='pointer'>&#187;</span> Случайный текст</p>-->
-                        <div class="users-theme">
+                        <div class="users-theme js_users-theme">
                             <?php
                                 require "controllers/component_user_get_name_texts.php";
                                 echo $result;
@@ -82,11 +82,11 @@
                         <h2 class="default-text-list__head main-header_h2 pink-neon">Быстрый старт:</h2>
                         <div class="select__wrapper blue-neon-box">
                             <span class="select__arrow">&#9660;</span>
-                            <select class="select">
+                            <select class="select default-select">
                                 <?php
                                     require_once "controllers/component_default_get_name_texts.php";
                                     foreach($data as $val){
-                                        echo "<option class='default-text-list__name select__option blue-neon' data-id=".$val['id']."><span class='js_value'>" . $val['name'] . "</span></option>";
+                                        echo "<option class='default-text-list__name select__option blue-neon' data-id='".$val['id']."' name='".$val['name']."'><span class='js_value'>" . $val['name'] . "</span></option>";
                                     }
                                 ?>
                             </select>
@@ -123,7 +123,7 @@
                     <section class="section main__head main__section">
                         <input class="main__name blue-neon-box js_main-name" type="text" placeholder="Название">
                         <input class="main__theme-name blue-neon-box js_main-theme-name" type="text" placeholder="Тема">
-                        <p class="current-text-id pink-neon"></p>
+                        <p class="current-text-id pink-neon js_current-text-id-wrapper"></p>
                     </section>
                     <p class="message pink-neon">Привет!</p>
                     

@@ -31,10 +31,10 @@
                                 <h4 class='user-text-list__head bright-blue-neon'>".$val["area"]."</h4>
                                 <div class='select__wrapper blue-neon-box'>
                                     <span class='select__arrow'>&#9660;</span>
-                                    <select class='select'>";
+                                    <select class='select js_select'>";
         }
         
-        $result = $result."<option class='user-text-list__name select__option blue-neon' data-id=".$val['id']." data-area='".$val["area"]."'>" . $val['name'] . "</option>";
+        $result = $result."<option class='user-text-list__name select__option blue-neon js_user-text-name' data-id=".$val['id']." data-area='".$val["area"]."' name='".$val['name']."'>" . $val['name'] . "</option>";
         $temp   = true;
     }
     

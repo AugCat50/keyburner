@@ -21,6 +21,7 @@ function log_in(){
             },
             success: function(data){
                 if(data === "Есть совпадение!"){
+                    localStorage.clear();
                     document.location.href = 'user.php';
                 }
                 $(".dialog__message").html(data);

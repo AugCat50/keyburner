@@ -5,7 +5,7 @@
         <meta name="description" content="Тренажёр слепого набора">
         <meta name="keywords" content="Keyburner, Тренажёр слепого набора">
         <meta name="autor" content="draackul2@gmail.com">
-        <meta name="viewport" content="width=device-width; initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Keyburner - Тренажёр слепого набора</title>
         
         <link rel="shortcut icon" type="image/svg" href="img/favicon.jpg"/>
@@ -57,7 +57,7 @@
                         <?php
                             require_once "controllers/component_default_get_name_texts.php";
                             foreach($data as $val){
-                                echo "<li class='default-text-list__name blue-neon' data-id=".$val['id']."><span class='pointer'>&#187; </span><span class='js_value'>" . $val['name'] . "</span></li>";
+                                echo "<li class='default-text-list__name blue-neon' data-id='".$val['id']."' name='".$val['name']."'><span class='pointer'>&#187; </span><span class='js_value'>" . $val['name'] . "</span></li>";
                             }
                         ?>
                     </ul>

@@ -376,3 +376,210 @@
         
         return $data;
     }
+    
+    
+    //Функции работы с статистикой
+    //Обновление строки статистики в базе
+    function stat_update($pdo, $id, $it, $column){
+        try{
+            $query = "UPDATE texts SET $column = :statistics WHERE id = :id";
+            $stmt  = $pdo->prepare($query);
+            $stmt->bindParam(':statistics', $it);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            $data = true;
+        }catch(PDOException $e){
+            $data = "Ошибка в model -- statistics при попытке записать статистику в $column -- texts:" . $e->getMessage() . "<br>";
+        }
+        return $data;
+    }
+
+    
+    //Получение строк статистики
+    function stat_get($pdo, $id, $column){
+            
+        try{
+            $query = "SELECT $column FROM texts WHERE id = :id";
+            $stmt  = $pdo->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            
+            $statistics = $stmt->fetch();
+            if(is_array($statistics)){
+                $data = $statistics[0];
+            }else{
+                $data = false;
+            }
+            
+        }catch(PDOException $e){
+            $data = "Ошибка в model -- statistics при попытке получить статистику из $column -- texts:" . $e->getMessage() . "<br>";
+        }
+        
+        return $data;
+    }
+    
+    //Статистика общая
+    function statistics($pdo, $id, $time, $speed){
+        $user_id = $_SESSION['id'];
+        
+        //Получение общей статистики
+        $statistics = stat_get($pdo, $id, 'statistics');
+        
+        if($id && $time && $speed){
+            
+            //Данные для записи есть
+            //этот код возвращает true или текст ошибки
+            if(!$statistics){
+                
+                //Строка пустая, Данные для записи есть
+                $it   = '{' . $user_id . ',' . $time . '-' . $speed . ',' . $user_id . '}';
+                $data = stat_update($pdo, $id, $it, 'statistics');;
+                return $data;
+            }else{
+                
+                //Строка есть, Данные для записи есть
+                $open_str       = '{' . $user_id;
+                $end_str        = ',' . $user_id . '}';
+                $start_position = strripos($statistics, $open_str);
+                $end_position   = strripos($statistics, $end_str);
+                
+                $len_stat       = strlen($statistics);
+                $first_string   = substr($statistics, 0, $start_position);
+                $last_string    = substr($statistics, $end_position, $len_stat);
+                
+                if(!$end_position){
+                    
+                    //статистика есть, но не для этого пользователя. Просто добавляем в конец данные для записи
+                    $it   = $statistics . '{' . $user_id . ',' . $time . '-' . $speed . ',' . $user_id . '}';
+                    $data = stat_update($pdo, $id, $it, 'statistics');
+                    return $data;
+                }else{
+                    
+                    //Статистика для этого пользователя есть, работаем с ней
+                    $length_stat_str  = $end_position - $start_position;
+                    $user_stat_string = substr($statistics, $start_position, $length_stat_str) . ',' . $time . '-' . $speed;
+                    $it               = $first_string . $user_stat_string . $last_string;
+                    $data             = stat_update($pdo, $id, $it, 'statistics');
+                    return $data;
+                }
+            }
+        }else{
+            
+            //Данных для записи нет
+            //этот код возвращает данные статистики пользователю
+            if(!$statistics){
+                
+                //Строка пустая, Данных для записи нет
+                return "Статистика пуста";
+            }else{
+                
+                //Строка есть, Данных для записи нет
+                $open_str       = '{' . $user_id;
+                $end_str        = ',' . $user_id . '}';
+                $start_position = strripos($statistics, $open_str);
+                $end_position   = strripos($statistics, $end_str);
+                
+                $length_stat_str  = $end_position - $start_position;
+                $user_stat_string = substr($statistics, $start_position, $length_stat_str);
+                
+                $arr_of_stat_val = explode(',', $user_stat_string);
+                //здесь надо разбирать массив на данные и возвращать
+                return true;
+            }
+        }
+    }
+    
+    
+    //Работа с лучшим результатом
+    function statistics_best($pdo, $id, $time, $speed){
+        $user_id = $_SESSION['id'];
+        //Получение строки статистики лучших результатов
+        $statistics_best = stat_get($pdo, $id, 'statistics_best');
+        
+        if($id && $time && $speed){
+            //Данные для записи есть
+            
+            if(!$statistics_best){
+                //Строки нет, Данные есть
+                
+                $it   = '{' . $user_id . ',' . $time . '-' . $speed . ',' . $user_id . '}';
+                $data = stat_update($pdo, $id, $it, 'statistics_best');
+                
+                //Если пришла строка - это текст ошибки, если true - просто возвращаем текущую сткорость
+                if(is_string($data)){
+                    return $data;
+                }else{
+                    return $speed;
+                }
+            }else{
+                //Строка есть, Данные есть
+                
+                $open_str_best         = '{' . $user_id;
+                $start_position_best   = strripos($statistics_best, $open_str_best);
+                
+                $end_str_best      = ',' . $user_id . '}';
+                $end_position_best = strripos($statistics_best, $end_str_best);
+                
+                if(!$end_position_best){
+                    //Если пользовательской cтроки нет и есть данные для записи, просто записываем в конец общей строки
+                    
+                    $it = $statistics_best . '{' . $user_id . ',' . $time . '-' . $speed . ',' . $user_id . '}';
+                    $data = stat_update($pdo, $id, $it, 'statistics_best');
+                    
+                    //Если пришла строка - это текст ошибки, если true - просто возвращаем текущую сткорость
+                    if(is_string($data)){
+                        return $data;
+                    }else{
+                        return $speed;
+                    }
+                }else{
+                    //Есть пользовательская строка и есть данные для записи
+                    
+
+                    
+                    //Длина строки пользователя и сама строка
+                    $length_stat_str_best  = $end_position_best - $start_position_best;
+                    $user_stat_string_best = substr($statistics_best, $start_position_best, $length_stat_str_best);
+                    $arr_best              = explode('-', $user_stat_string_best);
+                    
+                    //Если новый результат больше того, что в базе, просто обновляем его
+                    if($arr_best[1] < $speed){
+                        $len_stat_best     = strlen($statistics_best);
+                        $first_string_best = substr($statistics_best, 0, $start_position_best);
+                        $last_string_best  = substr($statistics_best, $end_position_best, $len_stat_best);
+                        $it                = $first_string_best . '{' . $user_id . ',' . $time . '-' . $speed . $last_string_best;
+                        $data              = stat_update($pdo, $id, $it, 'statistics_best');
+                        //Если пришла строка - это текст ошибки, если true - просто возвращаем текущую сткорость
+                        if(is_string($data)){
+                            return $data;
+                        }else{
+                            return $speed;
+                        }
+                    }
+                } 
+            }
+        }else{
+            //Данных для записи нет
+            //Данный код возврщает значение лучшего результата
+            
+            $open_str_best       = '{' . $user_id;
+            $start_position_best = strripos($statistics_best, $open_str_best);
+            
+            if(!$start_position_best){
+                //Нет строки, нет данных для записи
+                
+                return "Статистика пуста";
+            }else{
+                //Есть строка, нет данных для записи
+                
+                $end_str_best          = ',' . $user_id . '}';
+                $end_position_best     = strripos($statistics_best, $end_str_best);
+                
+                //Длина строки пользователя и сама строка
+                $length_stat_str_best  = $end_position_best - $start_position_best;
+                $user_stat_string_best = substr($statistics_best, $start_position_best, $length_stat_str_best);
+                $arr_best              = explode('-', $user_stat_string_best);
+                return $arr_best[1];
+            }
+        }
+    }
