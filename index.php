@@ -5,7 +5,7 @@
         <meta name="description" content="Тренажёр слепого набора">
         <meta name="keywords" content="Keyburner, Тренажёр слепого набора">
         <meta name="autor" content="draackul2@gmail.com">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--        <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
         <title>Keyburner - Тренажёр слепого набора</title>
         
         <link rel="shortcut icon" type="image/svg" href="img/favicon.jpg"/>
@@ -43,8 +43,8 @@
             <div class="main-wrapper">
                 <header class="main-header">
                     <h1 class="h1 main-header_h1 bright-blue-neon">Keyburner</h1>
-                    <menu class="main-header-menu">
-                        <nav>
+                    <menu class="main-header-menu js_main-header-menu">
+                        <nav class="">
                             <li class="blue-neon main-header-menu__item js_clean-all"><span class='pointer'>&#187;</span> Новый текст</li>
                             <li class="blue-neon main-header-menu__item js_get-random-text-default"><span class='pointer'>&#187;</span> Случайный текст</li>
                             <li class="blue-neon main-header-menu__item js_check-in__show"><span class='pointer'>&#187;</span> Регистрация</li>
@@ -52,12 +52,12 @@
 <!--                            <li class="blue-neon main-header-menu__item"><span class='pointer'>&#187;</span> Добавить текст</li>-->
                         </nav>
                     </menu>
-                    <ul class="default-text-list">
+                    <ul class="default-text-list js_ul_list js_default-text-list">
                         <h3 class="default-text-list__head pink-neon">Быстрый старт:</h3>
                         <?php
                             require_once "controllers/component_default_get_name_texts.php";
                             foreach($data as $val){
-                                echo "<li class='default-text-list__name blue-neon' data-id='".$val['id']."' name='".$val['name']."'><span class='pointer'>&#187; </span><span class='js_value'>" . $val['name'] . "</span></li>";
+                                echo "<li class='default-text-list__name blue-neon js_default-text-list__name' data-id='".$val['id']."' name='".$val['name']."'><span class='pointer'>&#187; </span><span class='js_value'>" . $val['name'] . "</span></li>";
                             }
                         ?>
                     </ul>

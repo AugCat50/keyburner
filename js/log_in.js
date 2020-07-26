@@ -60,7 +60,8 @@ function log_in(){
         $(".authorization").show();
     });
     
-    $(".js_authorization__hide").click(function(){
+    $(".js_authorization__hide").click(function(event){
+        event.preventDefault();
         $(".authorization").hide();
     });
 //END BLOK-4

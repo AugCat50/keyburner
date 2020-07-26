@@ -11,9 +11,11 @@
 .main-header_h2{
     margin-bottom: 0;
     margin-top: 10px;
+    user-select: none;
 }
 .main-header_h2.default-text-list__head{
     margin-bottom: 10px;
+    user-select: none;
 }
 
 .main-header-menu{
@@ -22,6 +24,7 @@
 
 .main-header-menu__item{
     cursor: pointer;
+    user-select: none;
 }
 
 .main-header-menu .link{

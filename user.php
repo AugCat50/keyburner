@@ -67,9 +67,8 @@
                     
 <!--<div class="neon-line"></div>-->
                     
-                    <div class="users-theme-wrapper blue-neon-box">
+                    <div class="users-theme-wrapper blue-neon-box js_users-theme-wrapper">
                         <h2 class='h1 main-header_h2 pink-neon'>Ваши темы:</h2>
-                        <!--<p class="blue-neon main-header-menu__item js_get-random-text-user"><span class='pointer'>&#187;</span> Случайный текст</p>-->
                         <div class="users-theme js_users-theme">
                             <?php
                                 require "controllers/component_user_get_name_texts.php";
@@ -78,7 +77,7 @@
                         </div>
                     </div>
                     
-                    <div class="default-text-list blue-neon-box">
+                    <div class="default-text-list blue-neon-box js_default-text-list">
                         <h2 class="default-text-list__head main-header_h2 pink-neon">Быстрый старт:</h2>
                         <div class="select__wrapper blue-neon-box">
                             <span class="select__arrow">&#9660;</span>
@@ -86,7 +85,12 @@
                                 <?php
                                     require_once "controllers/component_default_get_name_texts.php";
                                     foreach($data as $val){
-                                        echo "<option class='default-text-list__name select__option blue-neon' data-id='".$val['id']."' name='".$val['name']."'><span class='js_value'>" . $val['name'] . "</span></option>";
+                                        echo "<option 
+                                            class='default-text-list__name select__option blue-neon js_default-text-list__name' 
+                                            data-id='".$val['id']."' 
+                                            name='".$val['name']."'>
+                                                <span class='js_value'>" . $val['name'] . "</span>
+                                            </option>";
                                     }
                                 ?>
                             </select>
@@ -149,6 +153,17 @@
                 <a target="_blank" href="https://www.artstation.com/antoinecollignon">Art by Antoine Collignon</a>
             </footer>
         </div>
+        
+        <dialog class="dialog dialog_delete">
+            <div class="dialog__display">
+                <div class="dialog__form" method="post">
+                    <h3 class="dialog__h bright-blue-neon">Удалить текст?</h3>
+                    <div class="dialog__message pink-neon js_dialog_delete-message"></div>
+                    <button class="button dialog__button blue-neon-box js_dialog_delete__ready">Удалить</button>
+                    <button class="button dialog__button blue-neon-box js_dialog_delete__hide">Отмена</button>
+                </div>
+            </div>
+        </dialog>
         
         <?php require_once "controllers/component_activation.php"?>
     </body>

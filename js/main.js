@@ -263,8 +263,6 @@ function main_ready(){
                 
                 if(stat_id != undefined && stat_id != ""){
                     let qwe = ajax_statistics(stat_id, end_time, result_speed);
-//                    alert(stat_id+"---"+end_time+"---"+result_speed);
-//                    alert (qwe);
                 }
                 //                console.log(my_time);
                 //                console.log(my_minute+":"+my_second);
@@ -310,6 +308,7 @@ function main_ready(){
     
 //BLOK-4    Подгрузка и работа с текстами из базы
     function ajaxQuery (id, its_text, clss){
+        //its_text = "get_user_text" если пользовательский или "get_default_text" если дефолтный
         $.ajax({
             url:    "ajax_user.php",
             method: "post",
@@ -331,6 +330,16 @@ function main_ready(){
         });
     }
     
+    
+    //Получение дефолтного текста, для списка ul на главной
+    $(".js_ul_list.js_default-text-list").on('click', '.js_default-text-list__name', function(){
+        localStorage.clear();
+        let id = $(this).attr('data-id');
+        
+        ajaxQuery(id, "get_default_text", ".js-main-textarea");
+        
+    });
+    
     //Получение дефолтного текста
     /*
         Как обойти отсутствие ивента клик по <select><option></option></select> в браузерах на движке хрома. 
@@ -345,6 +354,7 @@ function main_ready(){
         
         //Если флаг уже есть, то это клик по <option> внутри списка, а згачит можно получить val селекта
         if(my_this.hasClass('opened')){
+            localStorage.clear();
             let name      = my_this.val();
             //Получаем элемент по селектору типа $("[attr = 'val']")
             let my_option = $('[name = "'+name+'"]');
@@ -363,7 +373,6 @@ function main_ready(){
             $('.js-work-textarea').attr("placeholder", "Готовы приступать? :) \nШаблон блокируется на время теста.");
             
             //localStorage необходимо очистить, на случай если там сохранён ID пользовательского текста
-            localStorage.clear();
             localStorage.setItem("name", name);
             localStorage.setItem("area", area);
             localStorage.setItem("area-attr", area);
@@ -375,7 +384,9 @@ function main_ready(){
         }
     });
     
+    
     //При клике по документу вне раскрытого <select> удаляем класс opened у выпадающих списков
+    //Это обязательная часть кода для 'получения пользовательского текста по клику' и 'получения дефолтного текста по клику'
     $(document).click(function(e){
         let select = $('.select');
         
@@ -392,6 +403,7 @@ function main_ready(){
         
         //Если флаг уже есть, то это клик по <option> внутри списка, а згачит можно получить val селекта
         if(my_this.hasClass('opened')){
+            localStorage.clear();
             let name      = my_this.val();
             //Получаем элемент по селектору типа $("[attr = 'val']")
             let my_option = $('[name = "'+name+'"]');
@@ -424,8 +436,6 @@ function main_ready(){
                 $('.js_main-theme-name').attr('data', 'Default');
             }
             
-            localStorage.clear();
-            
             //Если в поиске дефолтный текст, сохраняем маркер area-attr='Default' и не сохраняем ID
             if(area !== "Default"){
                 localStorage.setItem("id", id);
@@ -452,15 +462,15 @@ function main_ready(){
         let r_ar_at = localStorage.getItem("area-attr");
         let r_text  = localStorage.getItem("text");
         
-        if(typeof(r_text) != "undefined" && r_text !== null && r_text != ""){
+        if(typeof(r_text) !== "undefined" && r_text !== null && r_text !== ""){
             $('.js_main-name').val(r_name);
             $('.js_main-theme-name').val(r_area);
             
-            if(r_id){
+            if(r_id && typeof(r_id) !== 'undefined' && r_id !== 'undefined'){
                 $('.current-text-id').html("ID:<span class='js_current-text-id'>"+r_id+"</span>");
             }
             
-            if(r_ar_at){
+            if(r_ar_at && typeof(r_ar_at) !== 'undefined'){
                 $('.js_main-theme-name').attr('data', r_ar_at);
             }
             
@@ -478,15 +488,75 @@ function main_ready(){
     }
     
     
-    //Случайный текст
-    $(".main-header-menu").on("click", ".js_get-random-text", function(){
-        let q = $(".select").find('.default-text-list__name').length;
+    //Случайный дефолтный текст
+    var BUFFER = -1;
+    $(".js_default-text-list, .main-header-menu").on("click", ".js_get-random-text-default", function(){
+        let list_length = $(".js_default-text-list").find('.js_default-text-list__name').length;
         
         function getRandomInt(min, max) {
           return Math.floor(Math.random() * (max - min)) + min;
         }
-        let qwe = getRandomInt(0, q);
-//        ajaxQuery(id, ".js-main-textarea");
+        
+        //Чтобы не повторялись числа
+        let number = getRandomInt(0, list_length);
+        while(BUFFER === number){
+            number = getRandomInt(0, list_length);
+        }
+        BUFFER = number;
+        
+        let find_elem = $('.js_default-text-list__name:eq('+number+')');
+        let elem_id   = find_elem.attr('data-id');
+        let elem_name = find_elem.attr('name');
+        let elem_area = 'Default';
+        
+        $('.js_main-name').val(elem_name);
+        $('.js_main-theme-name').val(elem_area);
+        $('.js_main-theme-name').attr('data', elem_area);
+        $('.js_current-text-id-wrapper').html('');
+        
+        //localStorage необходимо очистить, на случай если там сохранён ID пользовательского текста
+        localStorage.clear();
+        localStorage.setItem("name", elem_name);
+        localStorage.setItem("area", elem_area);
+        localStorage.setItem("area-attr", elem_area);
+        
+        ajaxQuery(elem_id, "get_default_text", ".js-main-textarea");
+    });
+    
+    
+    //Случайный пользовательский текст
+    var BUFFER_1 = -1;
+    $(".main-header-menu").on("click", ".js_get-random-text", function(){
+        let list_length = $(".js_users-theme").find('.js_user-text-name').length;
+        
+        function getRandomInt(min, max) {
+          return Math.floor(Math.random() * (max - min)) + min;
+        }
+        
+        //Чтобы не повторялись числа
+        let number = getRandomInt(0, list_length);
+        while(BUFFER_1 === number){
+            number = getRandomInt(0, list_length);
+        }
+        BUFFER_1 = number;
+        
+        let find_elem = $('.js_user-text-name:eq('+number+')');
+        let elem_id   = find_elem.attr('data-id');
+        let elem_name = find_elem.attr('name');
+        let elem_area = find_elem.attr('data-area');
+        
+        $('.js_main-name').val(elem_name);
+        $('.js_main-theme-name').val(elem_area);
+        $('.js_main-theme-name').removeAttr('data');
+        $('.js_current-text-id-wrapper').html("ID:<span class='js_current-text-id'>"+elem_id+"</span>");
+        
+        //localStorage необходимо очистить, на случай если там сохранён ID пользовательского текста
+        localStorage.clear();
+        localStorage.setItem("name", elem_name);
+        localStorage.setItem("area", elem_area);
+        localStorage.setItem("id", elem_id);
+        
+        ajaxQuery(elem_id, "get_user_text", ".js-main-textarea");
     });
 //END BLOK-4
     
@@ -495,6 +565,7 @@ function main_ready(){
     $(".main-header-menu").on('click', '.js_clean-all', function(){
         $('.js_main-name').val("");
         $('.js_main-theme-name').val("");
+        $('.js_main-theme-name').removeAttr('data');
         $('.current-text-id').html("");
         $(".js-main-textarea").val("");
         localStorage.clear();

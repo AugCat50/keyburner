@@ -25,7 +25,8 @@ function check_in(){
     });
     
     //Нажатие кнопки "Отмена"
-    $(".js_check-in__hide").click(function(){
+    $(".js_check-in__hide").click(function(event){
+        event.preventDefault();
         $(".check-in").hide();
     });
     

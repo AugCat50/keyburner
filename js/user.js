@@ -52,6 +52,10 @@ function user(){
                     });
                 }
                 
+                setTimeout(function(){
+                        $(clss).hide();
+                }, 3000);
+                
             },
             error: function (data){
                 $(clss).html(data).show();
@@ -59,24 +63,37 @@ function user(){
         });
     }
     
-    //Добавить текст
+    //Добавить или изменить текст
     $(".js-main").on("click", ".js_add-text", function(){
         let id    = $('.js_current-text-id').html();
         let name  = $(".js_main-name").val();
         let theme = $(".js_main-theme-name").val();
         let text  = $(".js-main-textarea").val();
         
+        function q(){
+            setTimeout(function(){
+                $(".message").hide();
+            }, 4000);
+        }
+        
         if($(".js_main-theme-name").attr('data') === "Default"){
             $(".message").html("Нельзя добавлять, менять, удалять стандартные тексты.<br> Тема 'Default' зарезервирована.").show();
+            q();
             return;
         }else if(name == false){
-            $(".message").html("Заполните имя!").show();
+            q();
             return;
         }else if(theme == false){
             $(".message").html("Заполните тему!").show();
+            q();
+            return;
+        }else if(theme === 'Default'){
+            $(".message").html("Тема 'Default' зарезервирована!").show();
+            q();
             return;
         }else if(text == false){
             $(".message").html("Заполните текст!").show();
+            q();
             return;
         }
         
@@ -90,6 +107,14 @@ function user(){
     
     //Удалить текст
     $(".js-main").on("click", ".js-del", function(){
+        $('.dialog_delete').show();
+    });
+    
+    $('.body').on('click', '.js_dialog_delete__hide', function(event){
+        $('.dialog_delete').hide();
+    })
+    
+    $('.body').on('click', '.js_dialog_delete__ready', function(event){
         let id         = $('.js_current-text-id').html();
         let theme      = $(".js_main-theme-name");
         let theme_name = theme.val();
@@ -105,11 +130,12 @@ function user(){
             $(".js-main-textarea").val("");
             localStorage.clear();
         }else if(!id && theme_attr === "Default"){
-            $(".message").html("Нельзя удалять стандартные тексты!").show();
+            $(".js_dialog_delete-message").html("Нельзя удалять стандартные тексты!").show();
         }else{
-            $(".message").html("Не удалось получить ID текста. Обратитесь к администратору").show();
+            $(".js_dialog_delete-message").html("Не удалось получить ID текста. Обратитесь к администратору").show();
         }
-    });
+        $('.dialog_delete').hide();
+    })
     
     
     //Поиск
@@ -146,6 +172,17 @@ function user(){
     $('.js_serch-result').on('click', '.js_saerch-close', function(){
         $('.js_serch-result').hide();
         $('.js_search-word').val("");
+    });
+    
+    
+    $('.js_main-name').oninput(function(){
+        let name = $('.js_main-name').val();
+        localStorage.setItem("name", name);
+    });
+    
+    $('.js_main-theme-name').oninput(function(){
+        let area = $('.js_main-theme-name').val();
+        localStorage.setItem("area", area);
     });
 }
 document.addEventListener("DOMContentLoaded", user);
