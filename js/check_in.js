@@ -12,6 +12,10 @@ function check_in(){
             },
             success:function(answer){
                 $(".js_check-in-message").html(answer);
+                
+//                setTimeout(function(){
+//                    $(".check-in").hide();
+//                }, 2000);
             },
             error:function(answer){
                 $(".js_check-in-message").html(answer);

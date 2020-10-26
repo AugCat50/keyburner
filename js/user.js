@@ -27,10 +27,32 @@ function user(){
             success: function (data){
                 
                 if(operation && operation != 'search'){
-                    //В ответ приходит строка ответа из модели и html отрисовки нового меню. Разделяем ответ и код и отрисовываем в их местах
-                    let index  = data.indexOf("</span>") + 7;
-                    let answer = data.slice(0, index);
-                    let html   = data.slice(index);
+                    //В ответ приходит строка ответа из модели и html отрисовки нового меню. (id, <span>Текст ответа</span>, html нового меню) Разделяем ответ и код и отрисовываем в их местах
+                    let index, answer, html;
+                    if(operation === 'add'){
+                        //При добавлении текста надо вернуть id из модели
+                        let in_id, id;
+                        in_id  = data.indexOf("<span>");
+                        index  = data.indexOf("</span>") + 7;
+                        id     = data.slice(0, in_id);
+                        answer = data.slice(in_id, index);
+                        html   = data.slice(index);
+                        
+                        //Если id нет, не отображаем блок. Это может произойти в случае, когда текст с таким именем уже есть
+                        if(id != '') {
+                            $('.js_current-text-id-wrapper').html("ID:<span class='js_current-text-id'>"+id+"</span>");
+                        }                      
+                        localStorage.setItem("id", id);
+                    }else{
+                        //При изменении текста id уже есть
+                        index  = data.indexOf("</span>") + 7;
+                        answer = data.slice(0, index);
+                        html   = data.slice(index);
+                    }
+                    
+                    localStorage.setItem("name", name);
+                    localStorage.setItem("area", theme);
+                    localStorage.setItem("text", text);
                     
                     $(clss).html(answer).show();
                     $('.users-theme').html(html);
@@ -73,7 +95,7 @@ function user(){
         function q(){
             setTimeout(function(){
                 $(".message").hide();
-            }, 4000);
+            }, 100000);
         }
         
         if($(".js_main-theme-name").attr('data') === "Default"){
@@ -175,14 +197,24 @@ function user(){
     });
     
     
-    $('.js_main-name').oninput(function(){
-        let name = $('.js_main-name').val();
-        localStorage.setItem("name", name);
+//    $('.js_main-name').oninput(function(){
+//        let name = $('.js_main-name').val();
+//        localStorage.setItem("name", name);
+//    });
+    
+//    $('.js_main-theme-name').oninput(function(){
+//        let area = $('.js_main-theme-name').val();
+//        localStorage.setItem("area", area);
+//    });
+    
+    
+    $('.graph').on('click', '.js_graph-button', function(){
+        $('.graph__dialog').show();
     });
     
-    $('.js_main-theme-name').oninput(function(){
-        let area = $('.js_main-theme-name').val();
-        localStorage.setItem("area", area);
+    $('.graph').on('click', '.js-graph__close', function(){
+        $('.graph__dialog').hide();
     });
+    
 }
 document.addEventListener("DOMContentLoaded", user);

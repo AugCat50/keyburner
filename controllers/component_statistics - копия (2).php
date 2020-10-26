@@ -19,42 +19,36 @@ if(isset($_POST['time'], $_POST['speed'])){
 $stat_first_expl = explode(',', $statistics);
 
 $count = count($stat_first_expl);
-//Код генерации изображения, выполняется только если в массиве статистики больше одного значения
 if($count>1){
     for($i=0; $i<$count; $i++){
         $my_data[$i] = explode('-', $stat_first_expl[$i]);
         //Все элементы массива с скоростью 0 пропускаем
         if($my_data[$i][1] != 0){
-            $x_data[]           = $my_data[$i][0];
-            $y_data[]           = $my_data[$i][1];
-            $for_sort_y_data[]  = $my_data[$i][1];
+            $x_data[]  = $my_data[$i][0];
+            $y_data[]  = $my_data[$i][1];
         }
     }
 
     //Занчения Y, сначала сортируем по возрастанию, затем удаляем повторяющиеся значения
     //Масиссив $y_data_sorted начинается с индекса 1
-    sort($for_sort_y_data);
-    $count = count($for_sort_y_data);
+    sort($y_data);
+    $count = count($y_data);
     for($i=0, $j=0, $k=0; $i<$count; $i++){
-        if($j<$for_sort_y_data[$i]){
+        if($j<$y_data[$i]){
             $k++;
-            $y_data_sorted[$k] = $for_sort_y_data[$i];
-            $j                 = $for_sort_y_data[$i];
+            $y_data_sorted[$k] = $y_data[$i];
+            $j                 = $y_data[$i];
         }else{
-            $y_data_sorted[$k] = $for_sort_y_data[$i];
+            $y_data_sorted[$k] = $y_data[$i];
         }
     }
-    
-    
+
+
     // Задаем изменяемые значения #######################################
-    
+
     // Размер изображения
     $W=1000;
     $H=600;
-    if(count($y_data)<10){
-        $W=500;
-        $H=300;
-    }
 
     // Псевдо-глубина графика
     $DX=10;
@@ -112,8 +106,8 @@ if($count>1){
     $G['y'] = $H - ($MB + $DY);
 
     //Доступная для графика ширина и высота
-//    $GW = $E['x'] - $F['x'];
-//    $GH = $F['y'] - $A['y'];
+    $GW = $E['x'] - $F['x'];
+    $GH = $F['y'] - $A['y'];
 
     // Ширина одного символа
     $LW=imageFontWidth(2);
@@ -123,7 +117,7 @@ if($count>1){
     $val_interval = $y_data_sorted[$county] - $y_data_sorted[1];
 
     //Длина доступной оси Y в пикселях минус отступ сверху 10 пикселей
-    $AF_length = $F['y'] - $A['y'] - 15;
+    $AF_length = $F['y'] - $A['y'] - 10;
     //Елиниц на пиксель
     $AF_pixel  = $val_interval/$AF_length;
 
@@ -182,7 +176,7 @@ if($count>1){
             imageString($im, 2, $F['x']-47, $F['y']-16, $y_data_sorted[1], $text);
         }else{
             //Все горизонтальн выше нуля
-            $AF_next = (($y_data_sorted[$i] - $y_data_sorted[1])/$AF_pixel) + 10;
+            $AF_next = ($y_data_sorted[$i] - $y_data_sorted[1])/$AF_pixel;
             imageLine($im, $F['x'], $F['y']-$AF_next, $F['x']-5, $F['y']-$AF_next, $c);
             imageLine($im, $F['x'], $F['y']-$AF_next, $G['x'],   $G['y']-$AF_next, $c);
             imageLine($im, $G['x'], $G['y']-$AF_next, $D['x'],   $D['y']-$AF_next, $c);
@@ -192,64 +186,58 @@ if($count>1){
 
     //Вертикальные линии, чёрточки и подписи
     for($i=1; $i<=$count; $i++){
-        imageLine($im, $F['x']+$i*$FEi-$FEi*0.25, $F['y'], $F['x']+$i*$FEi-$FEi*0.25, $F['y']+5, $c);
-        imageLine($im, $F['x']+$i*$FEi-$FEi*0.25, $F['y'], $G['x']+$i*$FEi-$FEi*0.25, $G['y'], $c);
-        imageLine($im, $G['x']+$i*$FEi-$FEi*0.25, $G['y'], $B['x']+$i*$FEi-$FEi*0.25, $B['y'], $c);
-        imageStringup($im, 2, $F['x']+$i*$FEi-$FEi*0.25-6, $F['y']+62, $x_data[$i-1], $text);
+        imageLine($im, $F['x']+$i*$FEi, $F['y'], $F['x']+$i*$FEi, $F['y']+5, $c);
+        imageLine($im, $F['x']+$i*$FEi, $F['y'], $G['x']+$i*$FEi, $G['y'], $c);
+        imageLine($im, $G['x']+$i*$FEi, $G['y'], $B['x']+$i*$FEi, $B['y'], $c);
+        imageStringup($im, 2, $F['x']+$i*$FEi-6, $F['y']+62, $x_data[$i-1], $text);
     }
 
     //Сами столбики
-    //Сдвиг на четверть влево по оси х
-    $j = $FEi*0.25;
-    //сдвиг на половину вправо или влево от черты с подписью по оси Х
-    $k = $FEi*0.5;
-    //Отступ справа или слава от столбика по оси Х
-    $t = 3;
     for($i=1; $i<=$count; $i++){
 
         if($y_data[$i-1] == $y_data_sorted[1]){
             //Для минимального значения скорости, куб высотой до 10
-            imageRectangle($im, $F['x']+$i*$FEi-$k-$j+$t, $F['y'], $F['x']+$i*$FEi+$k-$j-$t, $F['y']-9, $bar[0][1]);
-            imagefilltoborder($im,  $F['x']+$i*$FEi-$k-$j+$t+1, $F['y']-1, $bar[0][1], $bar[0][1]);
+            imageRectangle($im, $F['x']+$i*$FEi-$FEi*0.5+3, $F['y'], $F['x']+$i*$FEi+$FEi*0.5-3, $F['y']-9, $bar[0][1]);
+            imagefilltoborder($im,  $F['x']+$i*$FEi-$FEi*0.5+3+1, $F['y']-1, $bar[0][1], $bar[0][1]);
 
             //Верхняя грань
             $points = array(
-                $F['x']+$i*$FEi-$k-$j+$t     , $F['y']-9,
-                $F['x']+$i*$FEi-$k-$j+$t+$DX , $F['y']-9-$DY,
-                $F['x']+$i*$FEi+$k-$j-$t+$DX , $F['y']-9-$DY,
-                $F['x']+$i*$FEi+$k-$j-$t     , $F['y']-9
+                $F['x']+$i*$FEi-$FEi*0.5+3     , $F['y']-9,
+                $F['x']+$i*$FEi-$FEi*0.5+3+$DX , $F['y']-9-$DY,
+                $F['x']+$i*$FEi+$FEi*0.5-3+$DX , $F['y']-9-$DY,
+                $F['x']+$i*$FEi+$FEi*0.5-3     , $F['y']-9
             );
             imageFilledPolygon($im, $points, 4, $bar[0][0]);
 
             //Правая грань
             $points = array(
-                $F['x']+$i*$FEi+$k-$j-$t     , $F['y'],
-                $F['x']+$i*$FEi+$k-$j-$t     , $F['y']-9,
-                $F['x']+$i*$FEi+$k-$j-$t+$DX , $F['y']-9-$DY,
-                $F['x']+$i*$FEi+$k-$j-$t+$DX , $F['y']-$DY
+                $F['x']+$i*$FEi+$FEi*0.5-3     , $F['y'],
+                $F['x']+$i*$FEi+$FEi*0.5-3     , $F['y']-9,
+                $F['x']+$i*$FEi+$FEi*0.5-3+$DX , $F['y']-9-$DY,
+                $F['x']+$i*$FEi+$FEi*0.5-3+$DX , $F['y']-$DY
             );
             imageFilledPolygon($im, $points, 4, $bar[0][2]);
         }else{
             $AF_next = ($y_data[$i-1] - $y_data_sorted[1])/$AF_pixel;
             //Фронтальный прямоугольник и заливка
-            imageRectangle($im, $F['x']+$i*$FEi-$k-$j+$t, $F['y'], $F['x']+$i*$FEi+$k-$j-$t, $F['y']-$AF_next-9, $bar[0][1]);
-            imagefilltoborder($im,  $F['x']+$i*$FEi-$k-$j+$t+1, $F['y']-1, $bar[0][1], $bar[0][1]);
+            imageRectangle($im, $F['x']+$i*$FEi-$FEi*0.5+3, $F['y'], $F['x']+$i*$FEi+$FEi*0.5-3, $F['y']-$AF_next+1, $bar[0][1]);
+            imagefilltoborder($im,  $F['x']+$i*$FEi-$FEi*0.5+3+1, $F['y']-1, $bar[0][1], $bar[0][1]);
 
             //Верхняя грань
             $points = array(
-                $F['x']+$i*$FEi-$k-$j+$t     , $F['y']-$AF_next-9,
-                $F['x']+$i*$FEi-$k-$j+$t+$DX , $F['y']-$AF_next-9-$DY,
-                $F['x']+$i*$FEi+$k-$j-$t+$DX , $F['y']-$AF_next-9-$DY,
-                $F['x']+$i*$FEi+$k-$j-$t     , $F['y']-$AF_next-9
+                $F['x']+$i*$FEi-$FEi*0.5+3     , $F['y']-$AF_next+1,
+                $F['x']+$i*$FEi-$FEi*0.5+3+$DX , $F['y']-$AF_next+1-$DY,
+                $F['x']+$i*$FEi+$FEi*0.5-3+$DX , $F['y']-$AF_next+1-$DY,
+                $F['x']+$i*$FEi+$FEi*0.5-3     , $F['y']-$AF_next+1
             );
             imageFilledPolygon($im, $points, 4, $bar[0][0]);
 
             //Правая грань
             $points = array(
-                $F['x']+$i*$FEi+$k-$j-$t     , $F['y'],
-                $F['x']+$i*$FEi+$k-$j-$t     , $F['y']-$AF_next-9,
-                $F['x']+$i*$FEi+$k-$j-$t+$DX , $F['y']-$AF_next-9-$DY,
-                $F['x']+$i*$FEi+$k-$j-$t+$DX , $F['y']-$DY
+                $F['x']+$i*$FEi+$FEi*0.5-3     , $F['y'],
+                $F['x']+$i*$FEi+$FEi*0.5-3     , $F['y']-$AF_next+1,
+                $F['x']+$i*$FEi+$FEi*0.5-3+$DX , $F['y']-$AF_next+1-$DY,
+                $F['x']+$i*$FEi+$FEi*0.5-3+$DX , $F['y']-$DY
             );
             imageFilledPolygon($im, $points, 4, $bar[0][2]);
         }
@@ -273,7 +261,6 @@ if($count>1){
 
     imagedestroy($im);
 }else{
-//    $data = $statistics_best.'---'.'<p class="blue-neon">Статистики ещё нет</p>';
-    $data = $statistics_best.'---'.'0';
+    $data = $statistics_best.'---'.'Статистики ещё нет';
 }
-//echo $data;
+echo $data;

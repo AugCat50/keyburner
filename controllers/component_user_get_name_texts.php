@@ -1,8 +1,9 @@
 <?php
-    require_once "model/model.php";
-    $data = user_get_name_texts($pdo);
-    
-    //сортировка по ключу area
+require_once "model/model.php";
+$data = user_get_name_texts($pdo);
+
+//сортировка по ключу area
+if(is_array($data)){
     function area_sort($x, $y){
         if($x['area'] < $y['area']){
             return true;
@@ -33,11 +34,11 @@
                                     <span class='select__arrow'>&#9660;</span>
                                     <select class='select js_select'>";
         }
-        
+
         $result = $result."<option class='user-text-list__name select__option blue-neon js_user-text-name' data-id=".$val['id']." data-area='".$val["area"]."' name='".$val['name']."'>" . $val['name'] . "</option>";
         $temp   = true;
     }
-    
+
     if($result){
         $result = $result."</select></div></ul>";
         unset($i, $j, $temp);
@@ -45,3 +46,6 @@
         $result = "<p>Пока пусто</p>";
         unset($i, $j, $temp);
     }
+}else{
+    $result = $data;
+}

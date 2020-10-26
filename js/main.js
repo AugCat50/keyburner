@@ -269,6 +269,7 @@ function main_ready(){
                 //                console.log(errors);
                 //                console.log(result_speed.toFixed(3));
                 //                console.log(penalty_speed.toFixed(3));
+                ajaxQuery_stat(id, 'user');
             }
             
             old_work        = WORK_AREA.val();
@@ -326,6 +327,46 @@ function main_ready(){
                 
                 //Обнуление переменных.
                 null_var();
+                
+                let val = $(".js-main-textarea").val();
+                if(val != false){
+                    WORK_AREA.removeAttr("disabled");
+                    WORK_AREA.attr("placeholder", "Готовы приступать? :) \nШаблон блокируется на время теста.");
+                }else{
+                    WORK_AREA.attr("disabled", "true");
+                    WORK_AREA.attr("placeholder", "Сначала добавьте текст в верхнее поле");
+                    WORK_AREA.val("");
+                }
+            }
+        });
+    }
+    
+    function ajaxQuery_stat (id, access){
+        $.ajax({
+            url: "ajax_statistics.php",
+            method: "post",
+            data: {
+                id: id
+            },
+            success: function(data){
+                let max, image;
+                let index = data.indexOf("---");
+                if(index){
+                    max   = data.slice(0, index);
+                    image = data.slice(index+3);
+                    $(".js_stat-best").html(max);
+                    
+                    //График есть - показываем кнопку, графика нет - скрываем кнопку
+                    if(image != '0'){
+                        $(".graph__inner").html(image).show();
+                        $(".graph").show();
+                    }else{
+                        $(".graph").hide();
+                    }
+                }
+            },
+            error: function(data){
+                    $(".message").html(data).show();
             }
         });
     }
@@ -362,6 +403,8 @@ function main_ready(){
             let area      = "Default";
             
             ajaxQuery(id, "get_default_text", ".js-main-textarea");
+            //Пока дефолтные тексты без статистики
+            //ajaxQuery_stat(id, 'user');
             
             //Заполняем данными поля "Имя", "Тема", атрибут data инпута "Тема", затираем ID
             $('.js_main-name').val(name);
@@ -417,6 +460,7 @@ function main_ready(){
             }
             
             ajaxQuery(id, "get_user_text",".js-main-textarea");
+            ajaxQuery_stat(id, 'user');
             
             //Удалить атрибут data='Default', защищающий стандартнные тексты от изменения
             $('.js_main-theme-name').removeAttr('data');
@@ -521,6 +565,8 @@ function main_ready(){
         localStorage.setItem("area-attr", elem_area);
         
         ajaxQuery(elem_id, "get_default_text", ".js-main-textarea");
+        
+
     });
     
     

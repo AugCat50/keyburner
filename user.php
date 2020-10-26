@@ -121,6 +121,7 @@
                             <span class="pink-neon">Штраф: </span>
                             <span class="blue-neon js-penalty">0</span>
                         </div>
+                        <div class="statistics-section__item stat-best"><span class="pink-neon">Топ: </span><span class="blue-neon js_stat-best">0</span></div>
                         <div class="statistics-section__item blue-neon last"><span class="">(симв. в мин.)</span></div>
                     </section>
                     
@@ -128,6 +129,15 @@
                         <input class="main__name blue-neon-box js_main-name" type="text" placeholder="Название">
                         <input class="main__theme-name blue-neon-box js_main-theme-name" type="text" placeholder="Тема">
                         <p class="current-text-id pink-neon js_current-text-id-wrapper"></p>
+                        <div class="graph">
+                            <button class="graph__button pink-neon pink-neon-box js_graph-button">&#9660;</button>
+                            <dialog class="dialog graph__dialog">
+                                <div class="graph__inner">
+                                    <p class="blue-neon">Выберите текст для отображения статистики</p>
+                                </div>
+                                <button class="graph__close pink-neon pink-neon-box js-graph__close">&#10006;</button>
+                            </dialog>
+                        </div>
                     </section>
                     <p class="message pink-neon">Привет!</p>
                     
@@ -164,7 +174,5 @@
                 </div>
             </div>
         </dialog>
-        
-        <?php require_once "controllers/component_activation.php"?>
     </body>
 </html>

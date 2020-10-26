@@ -133,7 +133,7 @@
                     <input name="mail" class="dialog__input blue-neon-box js_check-in-mail" type="email" placeholder="Email">
                     <div class="dialog__message pink-neon js_check-in-message"></div>
                     <button class="button dialog__button blue-neon-box js_check-in-ready">Регистрация</button>
-                    <button class="button dialog__button blue-neon-box js_check-in__hide">Отмена</button>
+                    <button class="button dialog__button blue-neon-box js_check-in__hide">Закрыть</button>
                 </form>
             </div>
         </dialog>

@@ -76,15 +76,19 @@
             $data = "Ошибка в user_get_name_texts: " . $e->getMessage() . "<br>";
         }
         
+        if(!isset($data) || !is_array($data)) $data = 'У вас ещё нет текстов.';
         return $data;
     }
     
     
     //Не ясно, стоит ли проверять и id пользователя. Учитывая что он видит в списках только свои тексты
     function get_one_user_text($pdo, $id){
-        $query = "SELECT text FROM texts WHERE id = $id";
+        if(!$id){
+            return "Отсутствует ID.";
+        }
         
         try{
+            $query = "SELECT text FROM texts WHERE id = $id";
             $text    = $pdo->query($query);
             $content = $text->fetch();
             $data    = $content["text"];
@@ -229,7 +233,7 @@
             $stmt->bindParam(':solt', $solt);
             $stmt->bindParam(':mail', $hashed_mail);
             $stmt->execute();
-            $data="Пользователь зарегистрирован!<br>";
+            $data="Пользователь зарегистрирован!<br><br>";
         }catch(PDOException $e){
             $data = "Ошибка в model -- check_in_user при записи пользователя в таблицу users:" . $e->getMessage() . "<br>";
         }
@@ -250,8 +254,8 @@
         
         //Отправляем письмо
         $title = "Активация учётной записи на keyburner.com";
-        $message_html = "Активируйте учётную запись, пройдя по ссылке: <a href='http://94.244.191.245/keyburner/user.php?key=$hashed_key'>Активировать</a>";
-        $message_nohtml = "Активируйте учётную запись пройдя по ссылке: http://94.244.191.245/keyburner/user.php?key=$hashed_key";
+        $message_html = "Активируйте учётную запись, пройдя по ссылке: <a href='http://94.244.191.245/keyburner/activation.php?key=$hashed_key'>Активировать</a><br>Если вы не создавали учётную запись, проигнорируйте это письмо.";
+        $message_nohtml = "Активируйте учётную запись пройдя по ссылке: http://94.244.191.245/keyburner/activation.php?key=$hashed_key   Если вы не создавали учётную запись, проигнорируйте это письмо.";
         $and_mail = send_mail($mail, $title, $message_html, $message_nohtml);
         
         //Делаем запись в таблицу ожидающих активации
@@ -302,31 +306,31 @@
 
     function add_user_text($pdo, $name, $theme, $text){
         if(!$pdo){
-            return "add_user_text -- необходимо передать объект PDO в пером аргументе!";
+            return "<span>add_user_text -- необходимо передать объект PDO в пером аргументе!</span>";
         }else if(!$name){
-            return "add_user_text -- второй аргумент - имя - не должен быть пуст!";
+            return "<span>add_user_text -- второй аргумент - имя - не должен быть пуст!</span>";
         }else if(!$theme){
-            return "add_user_text -- третий аргумент - тема - не должен быть пуст!";
+            return "<span>add_user_text -- третий аргумент - тема - не должен быть пуст!</span>";
         }else if(!$text){
-            return "add_user_text -- четвёртый аргумент - текст - не должен быть пуст!";
+            return "<span>add_user_text -- четвёртый аргумент - текст - не должен быть пуст!</span>";
         }
         
-//        try{
-//            $query = "SELECT 1 FROM texts WHERE (id_user = :id_user) AND (name = :name) AND (area = :theme)";
-//            $stmt  = $pdo->prepare($query);
-//            $stmt->bindParam(":id_user", $_SESSION["id"]);
-//            $stmt->bindParam(":theme", $theme);
-//            $stmt->bindParam(":name", $name);
-//            $stmt->execute();
-//            $exist_text = $stmt->fetch();
-//            
-//            if($exist_text){
-//                $data = "У вас уже есть текст с этим именем в этой теме!";
-//                return $data;
-//            }
-//        }catch(PDOException $e){
-//            $data = "Ошибка в model -- add_user_text при попытке проверить наличие текста в texts:" . $e->getMessage() . "<br>";
-//        }
+        try{
+            $query = "SELECT 1 FROM texts WHERE (id_user = :id_user) AND (name = :name) AND (area = :theme)";
+            $stmt  = $pdo->prepare($query);
+            $stmt->bindParam(":id_user", $_SESSION["id"]);
+            $stmt->bindParam(":theme", $theme);
+            $stmt->bindParam(":name", $name);
+            $stmt->execute();
+            $exist_text = $stmt->fetch();
+            
+            if($exist_text){
+                $data = "<span>У вас уже есть текст с этим именем в этой теме!</span>";
+                return $data;
+            }
+        }catch(PDOException $e){
+            $data = "<span>Ошибка в model -- add_user_text при попытке проверить наличие текста в texts:" . $e->getMessage() . "</span>";
+        }
         
         try{
             $query = "INSERT INTO texts (id_user, name, area, text) VALUES (:id_user, :name, :theme, :text)";
@@ -336,9 +340,10 @@
             $stmt->bindParam(":theme", $theme);
             $stmt->bindParam(":text", $text);
             $stmt->execute();
-            $data = "Текст сохранён!";
+            $n_id = $pdo->lastInsertId();
+            $data = $n_id."<span>Текст сохранён!</span>";
         }catch(PDOException $e){
-            $data = "Ошибка в model -- add_user_text при попытке добавить текст в texts:" . $e->getMessage() . "<br>";
+            $data = "<span>Ошибка в model -- add_user_text при попытке добавить текст в texts:" . $e->getMessage() . "</span>";
         }
         
         return $data;
@@ -436,11 +441,14 @@
                 $data = stat_update($pdo, $id, $it, 'statistics');;
                 return $data;
             }else{
-                
                 //Строка есть, Данные для записи есть
+                
+                //Позиция начала строки
                 $open_str       = '{' . $user_id;
-                $end_str        = ',' . $user_id . '}';
                 $start_position = strripos($statistics, $open_str);
+                
+                //Позиция конца строки
+                $end_str        = ',' . $user_id . '}';
                 $end_position   = strripos($statistics, $end_str);
                 
                 $len_stat       = strlen($statistics);
@@ -472,19 +480,21 @@
                 //Строка пустая, Данных для записи нет
                 return "Статистика пуста";
             }else{
-                
                 //Строка есть, Данных для записи нет
-                $open_str       = '{' . $user_id;
+                
+                $open_str        = '{' . $user_id;
+                $start_position = strripos($statistics, $open_str) + strlen($open_str) + 1;
+                
                 $end_str        = ',' . $user_id . '}';
-                $start_position = strripos($statistics, $open_str);
                 $end_position   = strripos($statistics, $end_str);
                 
                 $length_stat_str  = $end_position - $start_position;
                 $user_stat_string = substr($statistics, $start_position, $length_stat_str);
                 
-                $arr_of_stat_val = explode(',', $user_stat_string);
+//                $arr_of_stat_val = explode(',', $user_stat_string);
                 //здесь надо разбирать массив на данные и возвращать
-                return true;
+//                print_r($user_stat_string);
+                return $user_stat_string;
             }
         }
     }
@@ -535,8 +545,6 @@
                 }else{
                     //Есть пользовательская строка и есть данные для записи
                     
-
-                    
                     //Длина строки пользователя и сама строка
                     $length_stat_str_best  = $end_position_best - $start_position_best;
                     $user_stat_string_best = substr($statistics_best, $start_position_best, $length_stat_str_best);
@@ -562,24 +570,24 @@
             //Данных для записи нет
             //Данный код возврщает значение лучшего результата
             
-            $open_str_best       = '{' . $user_id;
-            $start_position_best = strripos($statistics_best, $open_str_best);
+            $end_str_best          = ',' . $user_id . '}';
+            $end_position_best     = strripos($statistics_best, $end_str_best);
             
-            if(!$start_position_best){
+            if(!$end_position_best){
                 //Нет строки, нет данных для записи
                 
-                return "Статистика пуста";
+                return "Статистика пуста.";
             }else{
                 //Есть строка, нет данных для записи
                 
-                $end_str_best          = ',' . $user_id . '}';
-                $end_position_best     = strripos($statistics_best, $end_str_best);
+                $open_str_best       = '{' . $user_id;
+                $start_position_best = strripos($statistics_best, $open_str_best);
                 
                 //Длина строки пользователя и сама строка
                 $length_stat_str_best  = $end_position_best - $start_position_best;
                 $user_stat_string_best = substr($statistics_best, $start_position_best, $length_stat_str_best);
                 $arr_best              = explode('-', $user_stat_string_best);
-                return $arr_best[1];
+                return  $arr_best[1];
             }
         }
     }
