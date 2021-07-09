@@ -1,0 +1,22 @@
+.html{
+    background-color: rgb(32,18,69);
+    background-image: url(antoine-collignon-into-self-discovery.jpg);
+    background-size: cover;
+    min-width: 750px;
+}
+
+*{
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+.red{
+    color: red;
+}
+.blue{
+    color: blue;
+}
+
+.pointer{
+    font-size: 23px;
+}

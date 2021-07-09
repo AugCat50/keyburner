@@ -1,0 +1,9 @@
+.user-text-list{
+    margin-top: 0px;
+    margin-bottom: 30px;
+}
+    
+.user-text-list__head{
+    margin: 5px 0;
+    user-select: none;
+}

@@ -1,0 +1,44 @@
+.select__wrapper{
+    background-color: rgba(0,0,0,.5);
+    position: relative;
+}
+
+.select__arrow{
+    position: absolute;
+    right: 4px;
+    top: 4px;
+}
+
+.select{
+    border: none;
+    background: none;
+    color: #c6e2ff;
+    padding: 4px;
+    padding-right: 20px;
+/*    max-width: 225px;*/
+/*    outline: none;*/
+    -moz-appearance: none;
+	-webkit-appearance: none;
+	appearance: none;
+    position: relative;
+    cursor: pointer;
+/*    width: 100%;*/
+    width: 208px;
+    text-overflow: ellipsis;
+}
+
+.select__pointer{
+    position: absolute;
+    right: 4px;
+    top: 4px;
+}
+
+.select__option{
+/*    background: #369;*/
+/*    background: black;*/
+/*    background: rgb(24,15,48);*/
+    background: rgb(32,18,69);
+    padding: 4px;
+/*    overflow: hidden;*/
+/*    text-overflow: ellipsis;*/
+}

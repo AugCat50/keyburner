@@ -1,0 +1,38 @@
+.button{
+    float: right;
+    background-color: rgba(0,0,0,.5);
+/*
+    border: 1px solid #c6e2ff;
+    border-radius: 3px;
+    box-shadow:
+    0 0 6px rgba(202,228,225,0.23),
+    0 0 30px rgba(202,228,225,0.09),
+    0 0 12px rgba(30,132,242,0.13),
+    0 0 21px rgba(30,132,242,0.23),
+    0 0 34px rgba(30,132,242,0.2),
+    0 0 54px rgba(30,132,242,0.23);
+*/
+/*    color: #c6e2ff;*/
+    margin-top: 5px;
+    padding: 3px 8px;
+}
+
+.button:hover{
+    cursor: pointer;
+    box-shadow:
+    0 0 6px rgba(217,48,107,0.23),
+    0 0 30px rgba(217,48,107,0.09),
+    0 0 12px rgba(254,62,134,0.13),
+    0 0 21px rgba(254,62,134,0.23),
+    0 0 34px rgba(254,62,134,0.2),
+    0 0 54px rgba(254,62,134,0.23);
+    border-color: white;
+/*
+    color: rgb(217,48,107);
+    border-color: rgb(217,48,107);
+*/
+}
+
+.button + .button{
+    margin-right: 10px;
+}

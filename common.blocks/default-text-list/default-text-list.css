@@ -1,0 +1,22 @@
+.default-text-list{
+    margin-top: 40px;
+}
+
+.user .default-text-list{
+    margin-top: 20px;
+    padding: 10px;
+    background-color: rgba(0,0,0,.5);
+}
+
+.default-text-list__head{
+    font-size: 22px;
+}
+
+.default-text-list__name{
+    margin-bottom: 5px;
+    font-size: 18px;
+}
+
+.default-text-list__name:hover{
+    cursor: pointer;
+}

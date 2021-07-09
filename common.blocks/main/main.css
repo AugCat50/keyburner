@@ -1,0 +1,169 @@
+.main{
+    margin-left: 30px;
+    font-size: 20px;
+    width: 100%;
+    padding-top: 40px;
+    padding-right: 5px;
+}
+
+.main__statistics{
+    margin-bottom: 10px;
+}
+
+.main__section{
+    margin-bottom: 5px;
+}
+
+.main__head{
+    display: flex;
+    justify-content: flex-start;
+}
+
+.message{
+/*    display: inline-block;*/
+    margin: 10px 0 !important;
+    margin-left: 20px;
+    display: none;
+}
+
+.current-text-id{
+    margin: 0;
+}
+
+.main__section + .main__section{
+    margin-top: 20px;
+}
+
+/*    border: 2px solid #DEB3EE;*/
+.textarea{
+    width: 100%;
+    height: auto;
+/*
+    background-color: rgba(255,255,255,.7);
+    border-radius: 3px;
+    border: 2px solid #3B2A6E;
+    box-shadow: 0px 0px 4px 1px rgba(255, 255, 255, 0.5);
+*/
+/*    background-color: rgba(255,255,255,0);*/
+    background-color: rgba(0,0,0,.5);
+    
+/*    color: #c6e2ff;*/
+    
+    
+    resize: none;
+    overflow: auto;    
+    padding: 20px;
+}
+
+.main__textarea{
+    min-height: 230px;
+    max-height: 40vh;
+}
+
+div.main__textarea{
+    user-select: none;
+}
+
+.main__work-textarea{
+    user-select: none;
+}
+
+.main-inner{
+    color: #392E34;
+    display: inline;
+}
+
+.main__name,
+.main__theme-name{
+    background-color: rgba(0,0,0,.5);
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-right: 10px;
+}
+
+.main__name{
+    max-width: 250px;
+    text-overflow: ellipsis;
+}
+
+.main__theme-name{
+    max-width: 150px;
+    text-overflow: ellipsis;
+}
+
+.main__button{
+    padding: 5px !important;
+    height: 40px;
+    width: 40px;
+}
+
+.main__ico{
+    width: 30px;
+    height: auto;
+}
+
+.save-button{
+    padding: 6px !important;
+}
+
+.main__ico-save{
+    width: 28px;
+}
+
+.main__button-edit{
+    margin-right: 30px !important;
+}
+
+.graph{
+    display: none;
+}
+
+.graph__button{
+    padding: 1px 3px;
+    background-color: rgba(0,0,0,.5);
+    margin-left: 10px;
+}
+
+.graph__button:hover{
+    cursor: pointer;
+    box-shadow:
+    0 0 6px rgba(217,48,107,0.23),
+    0 0 30px rgba(217,48,107,0.09),
+    0 0 12px rgba(254,62,134,0.13),
+    0 0 21px rgba(254,62,134,0.23),
+    0 0 34px rgba(254,62,134,0.2),
+    0 0 54px rgba(254,62,134,0.23);
+    border-color: white;
+}
+
+.graph__inner{
+    position: relative;
+    width: 100%;
+    height: 100vh;
+/*    background-color: rgba(0,0,0,.5);*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.graph__close{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 30px;
+    background: none;
+    cursor: pointer;
+}
+
+.activation-main{
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.activation-main__button{
+    text-decoration: none;
+    font-size: 30px;
+}
